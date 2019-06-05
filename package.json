@@ -1,0 +1,16 @@
+{
+  "name": "goape-calendar",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/NicholasMcKenna/goape-calendar.git",
+  "author": "Nicholas McKenna <nicholas.a.mckenna@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.33.0",
+    "webpack-cli": "^3.3.2"
+  },
+  "scripts": {
+    "dev": "webpack --mode development"
+  }
+}
