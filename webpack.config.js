@@ -17,5 +17,8 @@ module.exports = {
         collapseWhitespace: false
       }
     })
-  ]
+  ],
+  resolve: {
+    extensions: ['.js', '.ts']
+  },
 };
