@@ -1,5 +1,6 @@
 console.log("fetching data from feed again");
 let eventDataForThisMonth;
+let eventDates = [];
 
 getJsonFeed("mapEventsData");
 
@@ -11,7 +12,7 @@ function getJsonFeed(callback) {
             dataType: "jsonp",
             jsonp: false,
             jsonpCallback: callback,
-            success: function(response) {
+            success: function (response) {
                 console.log(response); // server response
                 mapEventDates(response);
             }
@@ -21,5 +22,26 @@ function getJsonFeed(callback) {
 
 function mapEventDates(callback) {
     let events = callback.feed.data.Events.Event;
-    console.log(events);
+    let tempEventDates = []
+    for (let i = 0; i < events.length; i++) {
+        tempEventDates.push((new Date(events[i].ActualEventDate)).setHours(0, 0, 0, 0).valueOf());
+    }
+    eventDates = [...new Set(tempEventDates)];
+    setupDatePicker();
+}
+
+function setupDatePicker() {
+    $.datepicker.setDefaults($.datepicker.regional['']);
+    $('.date_picker').datepicker({
+        "beforeShowDay": beforeShowDay,
+        //"onSelect": onSelect,
+        //"onChangeMonthYear": onChangeMonthYear,
+        "dateFormat": "yy-mm-dd",
+        dayNamesMin: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        firstDay: 1
+    });
+}
+
+function beforeShowDay(date) {
+    return [$.inArray(date.valueOf(), eventDates) + 1, "has-events"];
 }
