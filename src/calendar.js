@@ -2,16 +2,21 @@
 
 let events;
 let eventDates = [];
+let initialLoad = true;
+let cache = [];
+
 const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
 const url = 'https://bookings.goape.co.uk/BatterseaPark/feed';
 
-getJsonFeed("test", "2019-06-03", "2019-06-30");
+getJsonFeed("test", "2019-06-01", "2019-06-30");
 
 function getJsonFeed(callback, fromDate, toDate) {
+    console.log("getJsonFeed, fromDate: " + fromDate + " toDate: " + toDate);
     // TODO: Activate please wait
     Promise.resolve(
         jQuery.ajax({
             type: "GET",
+            cache: true,
             url: url + "/events?json&full&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate,
             dataType: "jsonp",
             jsonp: false,
@@ -19,21 +24,26 @@ function getJsonFeed(callback, fromDate, toDate) {
             timeout: 10000
         })
     ).then(function (response) {
-        console.log(response); // server response
+        cache.push(response);
         mapEventDates(response);
     }).catch(function (e) {
         console.log("error geting feed: " + e.statusText);
     });
 }
 
+function lazyLoadNextMonth(date) {
+    
+}
+
 function mapEventDates(callback) {
+    console.log("mapEventDates", callback);
     events = callback.feed.Events.Event;
     let tempEventDates = [];
     for (let i = 0; i < events.length; i++) {
         tempEventDates.push((new Date(events[i].ActualEventDate)).setHours(0, 0, 0, 0).valueOf());
     }
     eventDates = [...new Set(tempEventDates)];
-    setupDatePicker();
+    initialLoad ? setupDatePicker() : $('.date_picker').datepicker("refresh");
 }
 
 function setupDatePicker() {
@@ -41,11 +51,12 @@ function setupDatePicker() {
     $('.date_picker').datepicker({
         "beforeShowDay": beforeShowDay,
         "onSelect": onSelect,
-        //"onChangeMonthYear": onChangeMonthYear,
+        "onChangeMonthYear": onChangeMonthYear,
         "dateFormat": "yy-mm-dd",
         dayNamesMin: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         firstDay: 1
     });
+    initialLoad = false;
 }
 
 function beforeShowDay(date) {
@@ -53,10 +64,6 @@ function beforeShowDay(date) {
 }
 
 function onSelect(date) {
-    console.log("dates selected");
-    console.log(date);
-
-
     getEventsAvailability("callbackx", date, date);
 }
 
@@ -64,6 +71,7 @@ function getEventsAvailability(callback, fromDate, toDate) {
     Promise.resolve(
         jQuery.ajax({
             type: "GET",
+            cache: true,
             url: url + "/eventsavailability?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate,
             dataType: "jsonp",
             jsonp: false,
@@ -94,13 +102,22 @@ function buildTimeSlotsUI(eventFeed) {
     let eventsAvailablity = eventFeed.feed.data.Events.Event;
     for (let i = 0; i < eventsAvailablity.length; i++) {
         let eventLink = document.createElement('div');
-        let occupancy = document.createElement('div');
 
         eventLink.innerHTML = '<div class="slot"><div class="time">' + eventsAvailablity[i].ActualEventDate + '</div><div class="capacity">' + eventsAvailablity[i].AvailableCapacity + '</div></a>';
         fragment.appendChild(eventLink);
     }
 
     eventTimesContainer.appendChild(fragment);
+}
+
+function onChangeMonthYear(year, month, inst) {
+    console.log("onchangeMonthYear: " + year + month);
+    var lastDayOfMonth = new Date(year, month, 0).getDate();
+    
+    let fromDate = year + '-' + month + '-' + '01';
+    let toDate = year + '-' + month + '-' + lastDayOfMonth;
+
+    getJsonFeed("test", fromDate, toDate);
 }
 
 // Useless method
