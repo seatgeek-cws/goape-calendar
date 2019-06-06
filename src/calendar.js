@@ -1,15 +1,16 @@
 //TODO: CORS is messing with this when you don't use the callback, checek on live server
-
 let events;
 let eventDates = [];
 let initialLoad = true;
 let cache = [];
 
+// populate values from URL
 const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
 const url = 'https://bookings.goape.co.uk/BatterseaPark/feed';
 
-getJsonFeed("test", "2019-06-01", "2019-06-30");
+getJsonFeed("callbackx", "2019-06-01", "2019-06-30");
 
+// Remove Callback references when on server
 function getJsonFeed(callback, fromDate, toDate) {
     console.log("getJsonFeed, fromDate: " + fromDate + " toDate: " + toDate);
     // TODO: Activate please wait
@@ -27,12 +28,12 @@ function getJsonFeed(callback, fromDate, toDate) {
         cache.push(response);
         mapEventDates(response);
     }).catch(function (e) {
-        console.log("error geting feed: " + e.statusText);
+        console.log("error geting feed: " + e.statusText, e);
     });
 }
 
 function lazyLoadNextMonth(date) {
-    
+    // Run in background, dont' make a new request if user selects this month
 }
 
 function mapEventDates(callback) {
@@ -81,7 +82,8 @@ function getEventsAvailability(callback, fromDate, toDate) {
     ).then(function (response) {
         buildTimeSlotsUI(response); // server response
     }).catch(function (e) {
-        console.log("error geting feed: " + e.statusText);
+        // TODO: Handle feed errors and cancel requests of timeouts and canceled sessions
+        console.log('error geting feed: ' + e.statusText);
     });
 }
 
@@ -112,7 +114,7 @@ function buildTimeSlotsUI(eventFeed) {
 
 function onChangeMonthYear(year, month, inst) {
     console.log("onchangeMonthYear: " + year + month);
-    var lastDayOfMonth = new Date(year, month, 0).getDate();
+    let lastDayOfMonth = new Date(year, month, 0).getDate();
     
     let fromDate = year + '-' + month + '-' + '01';
     let toDate = year + '-' + month + '-' + lastDayOfMonth;
