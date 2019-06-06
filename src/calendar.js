@@ -28,7 +28,7 @@ function getJsonFeed(callback, fromDate, toDate) {
 
 function mapEventDates(callback) {
     events = callback.feed.Events.Event;
-    let tempEventDates = []
+    let tempEventDates = [];
     for (let i = 0; i < events.length; i++) {
         tempEventDates.push((new Date(events[i].ActualEventDate)).setHours(0, 0, 0, 0).valueOf());
     }
@@ -55,18 +55,7 @@ function beforeShowDay(date) {
 function onSelect(date) {
     console.log("dates selected");
     console.log(date);
-    let legend = false;
-    let fragment = document.createDocumentFragment();
-    let eventTimesContainer = document.getElementsByClassName('event-times')[0];
 
-    if (!legend) {
-        $('.time-legend').show();
-        legend = true;
-    }
-
-    while (eventTimesContainer.firstChild) {
-        eventTimesContainer.removeChild(eventTimesContainer.firstChild);
-    }
 
     getEventsAvailability("callbackx", date, date);
 }
@@ -82,10 +71,36 @@ function getEventsAvailability(callback, fromDate, toDate) {
             timeout: 10000
         })
     ).then(function (response) {
-        console.log(response); // server response
+        buildTimeSlotsUI(response); // server response
     }).catch(function (e) {
         console.log("error geting feed: " + e.statusText);
     });
+}
+
+function buildTimeSlotsUI(eventFeed) {   
+    let legend = false;
+    let fragment = document.createDocumentFragment();
+    let eventTimesContainer = document.getElementsByClassName('event-times')[0];
+
+    if (!legend) {
+        $('.time-legend').show();
+        legend = true;
+    }
+
+    while (eventTimesContainer.firstChild) {
+        eventTimesContainer.removeChild(eventTimesContainer.firstChild);
+    }
+
+    let eventsAvailablity = eventFeed.feed.data.Events.Event;
+    for (let i = 0; i < eventsAvailablity.length; i++) {
+        let eventLink = document.createElement('div');
+        let occupancy = document.createElement('div');
+
+        eventLink.innerHTML = '<div class="slot"><div class="time">' + eventsAvailablity[i].ActualEventDate + '</div><div class="capacity">' + eventsAvailablity[i].AvailableCapacity + '</div></a>';
+        fragment.appendChild(eventLink);
+    }
+
+    eventTimesContainer.appendChild(fragment);
 }
 
 // Useless method
