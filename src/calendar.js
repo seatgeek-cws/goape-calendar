@@ -6,7 +6,7 @@ let cache = [];
 
 // populate values from URL
 const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
-const url = 'https://bookings.goape.co.uk/BatterseaPark/feed';
+const url = 'https://bookings.goape.co.uk/BatterseaPark/';
 
 getJsonFeed("callbackx", "2019-06-01", "2019-06-30");
 
@@ -18,7 +18,7 @@ function getJsonFeed(callback, fromDate, toDate) {
         jQuery.ajax({
             type: "GET",
             cache: true,
-            url: url + "/events?json&full&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate,
+            url: url + "feed/events?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
             dataType: "jsonp",
             jsonp: false,
             jsonpCallback: callback,
@@ -73,7 +73,7 @@ function getEventsAvailability(callback, fromDate, toDate) {
         jQuery.ajax({
             type: "GET",
             cache: true,
-            url: url + "/eventsavailability?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate,
+            url: url + "feed/eventsavailability?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate,
             dataType: "jsonp",
             jsonp: false,
             jsonpCallback: callback,
@@ -81,9 +81,10 @@ function getEventsAvailability(callback, fromDate, toDate) {
         })
     ).then(function (response) {
         buildTimeSlotsUI(response); // server response
+        console.log(response);
     }).catch(function (e) {
         // TODO: Handle feed errors and cancel requests of timeouts and canceled sessions
-        console.log('error geting feed: ' + e.statusText);
+        console.log('error geting feed: ' + e + " status: " + e.statusText);
     });
 }
 
@@ -105,7 +106,7 @@ function buildTimeSlotsUI(eventFeed) {
     for (let i = 0; i < eventsAvailablity.length; i++) {
         let eventLink = document.createElement('div');
 
-        eventLink.innerHTML = '<div class="slot"><div class="time">' + eventsAvailablity[i].ActualEventDate + '</div><div class="capacity">' + eventsAvailablity[i].AvailableCapacity + '</div></a>';
+        eventLink.innerHTML = '<a href=' + url + 'loader.aspx/?target=hall.aspx%3Fevent%3D' + eventsAvailablity[i].EventLocalId + '>' + '<div class="slot"><div class="time">' + eventsAvailablity[i].ActualEventDate + '</div><div class="capacity">' + eventsAvailablity[i].AvailableCapacity + '</div></a>';
         fragment.appendChild(eventLink);
     }
 
@@ -118,7 +119,6 @@ function onChangeMonthYear(year, month, inst) {
     
     let fromDate = year + '-' + month + '-' + '01';
     let toDate = year + '-' + month + '-' + lastDayOfMonth;
-
     getJsonFeed("test", fromDate, toDate);
 }
 
