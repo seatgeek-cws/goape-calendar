@@ -13,27 +13,34 @@ getJsonFeed("callbackx", "2019-06-01", "2019-06-30");
 // Remove Callback references when on server
 function getJsonFeed(callback, fromDate, toDate) {
     console.log("getJsonFeed, fromDate: " + fromDate + " toDate: " + toDate);
+    let month = new Date(fromDate).getMonth();
+    console.log(month);
     // TODO: Activate please wait
-    Promise.resolve(
-        jQuery.ajax({
-            type: "GET",
-            cache: true,
-            url: url + "feed/events?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
-            dataType: "jsonp",
-            jsonp: false,
-            jsonpCallback: callback,
-            timeout: 10000
-        })
-    ).then(function (response) {
-        cache.push(response);
-        mapEventDates(response);
-    }).catch(function (e) {
-        console.log("error geting feed: " + e.statusText, e);
-    });
+    console.log($.inArray(month, cache) === -1);
+    if ($.inArray(month, cache) === -1) {
+        Promise.resolve(
+            jQuery.ajax({
+                type: "GET",
+                cache: true,
+                url: url + "feed/events?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
+                dataType: "jsonp",
+                jsonp: false,
+                jsonpCallback: callback,
+                timeout: 10000
+            })
+        ).then(function (response) {
+            cache.push(month);
+            console.log(cache);
+            mapEventDates(response);
+        }).catch(function (e) {
+            console.log("error geting feed: " + e.statusText, e);
+        });
+    }
 }
 
-function lazyLoadNextMonth(date) {
+function lazyLoadNextMonth(month) {
     // Run in background, dont' make a new request if user selects this month
+    
 }
 
 function mapEventDates(callback) {
@@ -115,11 +122,15 @@ function buildTimeSlotsUI(eventFeed) {
 
 function onChangeMonthYear(year, month, inst) {
     console.log("onchangeMonthYear: " + year + month);
-    let lastDayOfMonth = new Date(year, month, 0).getDate();
+    let lastDay = lastDayOfMonth(year, month);
     
     let fromDate = year + '-' + month + '-' + '01';
-    let toDate = year + '-' + month + '-' + lastDayOfMonth;
+    let toDate = year + '-' + month + '-' + lastDay;
     getJsonFeed("test", fromDate, toDate);
+}
+
+function lastDayOfMonth(year, month) {
+    return new Date(year, month, 0).getDate();
 }
 
 // Useless method
