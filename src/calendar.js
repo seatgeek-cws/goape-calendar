@@ -13,11 +13,11 @@ getJsonFeed("callbackx", "2019-06-01", "2019-06-30");
 // Remove Callback references when on server
 function getJsonFeed(callback, fromDate, toDate) {
     console.log("getJsonFeed, fromDate: " + fromDate + " toDate: " + toDate);
-    let month = new Date(fromDate).getMonth();
-    console.log(month);
+    let date = [new Date(fromDate).getMonth(), new Date(fromDate).getFullYear()];
+    console.log(date);
     // TODO: Activate please wait
-    console.log($.inArray(month, cache) === -1);
-    if ($.inArray(month, cache) === -1) {
+    console.log($.inArray(date[0], cache) === -1);
+    if ($.inArray(date[0], cache) === -1) {
         Promise.resolve(
             jQuery.ajax({
                 type: "GET",
@@ -29,7 +29,7 @@ function getJsonFeed(callback, fromDate, toDate) {
                 timeout: 10000
             })
         ).then(function (response) {
-            cache.push(month);
+            cache.push(date[0]);
             console.log(cache);
             mapEventDates(response);
         }).catch(function (e) {
