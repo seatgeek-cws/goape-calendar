@@ -21,7 +21,9 @@
   },
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "dev": "webpack --mode development"
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production"
+
   },
   "dependencies": {
     "jQuery": "^1.7.4"

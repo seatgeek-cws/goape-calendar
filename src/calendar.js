@@ -56,10 +56,10 @@ function mapEventDates(callback) {
         eventDates = mergedSet;
     } else {
         eventDates = [...new Set(tempEventDates)];
+        setupDatePicker();
     }
-    initialLoad ? setupDatePicker() : $('.date_picker').datepicker("refresh");
 }
-//
+
 function setupDatePicker() {
     $.datepicker.setDefaults($.datepicker.regional['']);
     $('.date_picker').datepicker({
@@ -82,25 +82,19 @@ function onSelect(date) {
 }
 
 function getEventsAvailability(callback, fromDate, toDate) {
-    Promise.resolve(
-        jQuery.ajax({
-            type: "GET",
-            cache: true,
-            url: url + "feed/eventsavailability?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate,
-            dataType: "jsonp",
-            jsonp: false,
-            jsonpCallback: callback,
-            timeout: 10000
+    let eventsURL = url + "feed/eventsavailability?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate;
+    fetch(eventsURL)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            buildTimeSlotsUI(responseJson);
         })
-    ).then(function (response) {
-        buildTimeSlotsUI(response); // server response
-    }).catch(function (e) {
-        // TODO: Handle feed errors and cancel requests of timeouts and canceled sessions
-        console.log('error geting feed: ' + e + " status: " + e.statusText);
-    });
+        .catch((error) => {
+            console.log(error);
+        })
 }
 
 function buildTimeSlotsUI(eventFeed) {
+    console.log("building events", eventFeed);
     let legend = false;
     let fragment = document.createDocumentFragment();
     let eventTimesContainer = document.getElementsByClassName('event-times')[0];
@@ -126,11 +120,7 @@ function buildTimeSlotsUI(eventFeed) {
 }
 
 function onChangeMonthYear(year, month, inst) {
-    let lastDay = lastDayOfMonth(year, month);
-
-    let fromDate = year + '-' + month + '-' + '01';
-    let toDate = year + '-' + month + '-' + lastDay;
-    //getJsonFeed("test", fromDate, toDate);
+    $('.date_picker').datepicker("refresh");
 }
 
 function lastDayOfMonth(year, month) {
