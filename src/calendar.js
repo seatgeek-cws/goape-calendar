@@ -10,37 +10,25 @@ const url = 'https://bookings.goape.co.uk/BatterseaPark/';
 
 //TODO: Create start date of first event
 getJsonFeed("callbackx", "2019-06-01", "2019-06-30");
-// TODO: Remove Callback references when on server
 function getJsonFeed(callback, fromDate, toDate) {
     let month = new Date(fromDate).getMonth();
     let year = new Date(fromDate).getFullYear();
     // TODO: Activate please wait
     if (($.inArray(month, cache) === -1) && (month < 12)) {
-        Promise.resolve(
-            jQuery.ajax({
-                type: "GET",
-                cache: true,
-                url: url + "feed/events?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
-                dataType: "jsonp",
-                jsonp: false,
-                jsonpCallback: callback,
-                timeout: 10000
+        let eventFeedURL = url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true";
+        fetch(eventFeedURL)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                cache.push(month);
+                let lastDay = lastDayOfMonth(year, month + 2);
+                let newFrom = year + '-' + (month + 2) + '-' + '01';
+                let newTo = year + '-' + (month + 2) + '-' + lastDay;
+                mapEventDates(responseJson);
+                getJsonFeed("callbackx", newFrom, newTo);
             })
-        ).then(function (response) {
-            console.log('promise resolved');
-            //TODO: populate a fixed amount of months and update if needed
-
-            cache.push(month);
-            console.log(cache);
-            let lastDay = lastDayOfMonth(year, month + 2);
-            let newFrom = year + '-' + (month + 2) + '-' + '01';
-            let newTo = year + '-' + (month + 2) + '-' + lastDay;
-            mapEventDates(response);
-            getJsonFeed("callbackx", newFrom, newTo);
-
-        }).catch(function (e) {
-            console.log("error geting feed: " + e.statusText, e);
-        });
+            .catch((error) => {
+                console.log(error);
+            })
     }
 }
 
@@ -125,9 +113,4 @@ function onChangeMonthYear(year, month, inst) {
 
 function lastDayOfMonth(year, month) {
     return new Date(year, month, 0).getDate();
-}
-
-// Useless method
-function callbackx(result) {
-    console.log("callbackx" + result);
 }
