@@ -15,39 +15,42 @@ function getJsonFeed(callback, fromDate, toDate) {
     let month = new Date(fromDate).getMonth();
     let year = new Date(fromDate).getFullYear();
     // TODO: Activate please wait
-    Promise.resolve(
-        jQuery.ajax({
-            type: "GET",
-            cache: true,
-            url: url + "feed/events?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
-            dataType: "jsonp",
-            jsonp: false,
-            jsonpCallback: callback,
-            timeout: 10000
-        })
-    ).then(function (response) {
-        console.log('promise resolved');
-        //TODO: 
-        if (($.inArray(month, cache) === -1) && (month + 2 < 14)) {
+    if (($.inArray(month, cache) === -1) && (month < 12)) {
+        Promise.resolve(
+            jQuery.ajax({
+                type: "GET",
+                cache: true,
+                url: url + "feed/events?json&callback=" + callback + "&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
+                dataType: "jsonp",
+                jsonp: false,
+                jsonpCallback: callback,
+                timeout: 10000
+            })
+        ).then(function (response) {
+            console.log('promise resolved');
+            //TODO: populate a fixed amount of months and update if needed
+
             cache.push(month);
+            console.log(cache);
             let lastDay = lastDayOfMonth(year, month + 2);
             let newFrom = year + '-' + (month + 2) + '-' + '01';
-            let newTo = year + '-' + (month + 2) +'-' + lastDay;
-            mapEventDates(response, month);
+            let newTo = year + '-' + (month + 2) + '-' + lastDay;
+            mapEventDates(response);
             getJsonFeed("callbackx", newFrom, newTo);
-        }
-    }).catch(function (e) {
-        console.log("error geting feed: " + e.statusText, e);
-    });
+
+        }).catch(function (e) {
+            console.log("error geting feed: " + e.statusText, e);
+        });
+    }
 }
 
-function mapEventDates(callback, month) {
+function mapEventDates(callback) {
     events = callback.feed.Events.Event;
     let tempEventDates = [];
     for (let i = 0; i < events.length; i++) {
         tempEventDates.push((new Date(events[i].ActualEventDate)).setHours(0, 0, 0, 0).valueOf());
     }
-    
+
     if (eventDates.length > 0) {
         let mergedSet = [...new Set([...eventDates, ...tempEventDates])];
         eventDates = mergedSet;
@@ -56,7 +59,7 @@ function mapEventDates(callback, month) {
     }
     initialLoad ? setupDatePicker() : $('.date_picker').datepicker("refresh");
 }
-
+//
 function setupDatePicker() {
     $.datepicker.setDefaults($.datepicker.regional['']);
     $('.date_picker').datepicker({
