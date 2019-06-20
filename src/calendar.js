@@ -1,34 +1,44 @@
-//TODO: CORS is messing with this when you don't use the callback, checek on live server
 let events;
 let eventDates = [];
-let cache = [];
+let cache = []; //TODO: Update cache to include year
 let initialLoad = true;
 
 // populate values from URL
+// TODO: populate values from HTTP URL Request
 const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
 const url = 'https://bookings.goape.co.uk/BatterseaPark/';
 
-//TODO: Create start date of first event
-getJsonFeed("callbackx", "2019-06-01", "2019-06-30");
-function getJsonFeed(callback, fromDate, toDate) {
-    let month = new Date(fromDate).getMonth();
-    let year = new Date(fromDate).getFullYear();
+const today = new Date();
+const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
+const endDate =  today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
+
+getJsonFeed(startDate, endDate);
+// TODO: Remove Callback references when on server
+function getJsonFeed(fromDate, toDate) {
+    const month = new Date(fromDate).getMonth();
+    const year = new Date(fromDate).getFullYear();
     // TODO: Activate please wait
     if (($.inArray(month, cache) === -1) && (month < 12)) {
-        let eventFeedURL = url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true";
-        fetch(eventFeedURL)
-            .then((response) => response.json())
-            .then((responseJson) => {
-                cache.push(month);
-                let lastDay = lastDayOfMonth(year, month + 2);
-                let newFrom = year + '-' + (month + 2) + '-' + '01';
-                let newTo = year + '-' + (month + 2) + '-' + lastDay;
-                mapEventDates(responseJson);
-                getJsonFeed("callbackx", newFrom, newTo);
+        Promise.resolve(
+            jQuery.ajax({
+                type: "GET",
+                cache: true,
+                url: url + "feed/events?json&callback=removes&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
+                dataType: "jsonp",
+                jsonp: false,
+                jsonpCallback: "removes",
+                timeout: 10000
             })
-            .catch((error) => {
-                console.log(error);
-            })
+        ).then(function (response) {
+            cache.push(month);
+            let lastDay = lastDayOfMonth(year, month + 2);
+            let newFrom = year + '-' + (month + 2) + '-' + '01';
+            let newTo = year + '-' + (month + 2) + '-' + lastDay;
+            mapEventDates(response);
+            getJsonFeed(newFrom, newTo);
+        }).catch(function (e) {
+            console.log("error geting feed: " + e.statusText, e);
+        });
     }
 }
 
@@ -66,10 +76,10 @@ function beforeShowDay(date) {
 }
 
 function onSelect(date) {
-    getEventsAvailability("callbackx", date, date);
+    getEventsAvailability(date, date);
 }
 
-function getEventsAvailability(callback, fromDate, toDate) {
+function getEventsAvailability(fromDate, toDate) {
     let eventsURL = url + "feed/eventsavailability?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate;
     fetch(eventsURL)
         .then((response) => response.json())
@@ -82,7 +92,6 @@ function getEventsAvailability(callback, fromDate, toDate) {
 }
 
 function buildTimeSlotsUI(eventFeed) {
-    console.log("building events", eventFeed);
     let legend = false;
     let fragment = document.createDocumentFragment();
     let eventTimesContainer = document.getElementsByClassName('event-times')[0];
@@ -108,7 +117,11 @@ function buildTimeSlotsUI(eventFeed) {
 }
 
 function onChangeMonthYear(year, month, inst) {
-    $('.date_picker').datepicker("refresh");
+    if ($.inArray(month, cache) !== -1) {
+        $('.date_picker').datepicker("refresh");
+    } else {
+        //TODO: Set timeout and try again until month populates while showing PLease Wait;
+    }
 }
 
 function lastDayOfMonth(year, month) {
