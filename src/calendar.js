@@ -2,6 +2,7 @@ let events;
 let eventDates = [];
 let cache = []; //TODO: Update cache to include year
 let initialLoad = true;
+let plzwait = false;
 
 // populate values from URL
 // TODO: populate values from HTTP URL Request
@@ -18,16 +19,18 @@ function getJsonFeed(fromDate, toDate) {
     const month = new Date(fromDate).getMonth();
     const year = new Date(fromDate).getFullYear();
     // TODO: Activate please wait
-    if (($.inArray(month, cache) === -1) && (month < 12)) {
+
+    let checkMonth = $.inArray(month, cache) === -1;
+    if (checkMonth && (month < 12)) {
         Promise.resolve(
             jQuery.ajax({
                 type: "GET",
                 cache: true,
-                url: url + "feed/events?json&callback=removes&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
-                dataType: "jsonp",
+                url: url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
+                dataType: "json",
                 jsonp: false,
-                jsonpCallback: "removes",
-                timeout: 10000
+                timeout: 10000,
+                pleaseWaitDelay: false
             })
         ).then(function (response) {
             cache.push(month);
@@ -52,6 +55,7 @@ function mapEventDates(callback) {
     if (eventDates.length > 0) {
         let mergedSet = [...new Set([...eventDates, ...tempEventDates])];
         eventDates = mergedSet;
+        waitEnd();
     } else {
         eventDates = [...new Set(tempEventDates)];
         setupDatePicker();
@@ -120,10 +124,23 @@ function onChangeMonthYear(year, month, inst) {
     if ($.inArray(month, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
     } else {
-        //TODO: Set timeout and try again until month populates while showing PLease Wait;
+        pleaseWait();
     }
 }
 
 function lastDayOfMonth(year, month) {
     return new Date(year, month, 0).getDate();
+}
+
+function pleaseWait() {
+    plzwait = true;
+    $('.message-container h2').text("Please wait ....");
+}
+
+function waitEnd() {
+    if (plzwait) {
+        plzwait = false;
+        $('.message-container h2').text("Loaded");
+        $('.date_picker').datepicker("refresh");
+    }
 }
