@@ -1,5 +1,11 @@
 {
+    "presets": [
+      ["@babel/preset-env", {
+        "useBuiltIns": false,
+      }],
+    ],
     "plugins": [
-        "transform-regenerator"
+      "@babel/plugin-transform-runtime",
+      "@babel/plugin-transform-classes"
     ]
-}
+  }

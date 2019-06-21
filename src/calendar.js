@@ -11,11 +11,6 @@ let cache = []; //TODO: Update cache to include year
 let initialLoad = true;
 let plzwait = false;
 
-// populate values from URL
-// TODO: populate values from HTTP URL Request
-//const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
-//const url = 'https://bookings.goape.co.uk/BatterseaPark/';
-
 const today = new Date();
 const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
 const endDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
@@ -26,7 +21,10 @@ function getJsonFeed(fromDate, toDate) {
     const year = new Date(fromDate).getFullYear();
 
     let checkMonth = $.inArray(month, cache) === -1;
-    if (checkMonth && (month < 12)) {
+
+    //FIXME: Time out on last month selection: https://uat-bookings.goape.co.uk/WoburnSafariPark/custom/calendartest.aspx?showid=6d8f7883-3140-e911-80e8-00505601004c&interface=37
+    //FIXME: Time out if going back a month where no events present
+    if (checkMonth && (month < 13)) {
         Promise.resolve(
             jQuery.ajax({
                 type: "GET",
