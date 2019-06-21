@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: ['babel-polyfill', './src/index.js'],
+  entry:  './src/index.js',
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist')
@@ -16,7 +16,7 @@ module.exports = {
         removeComments: true,
         collapseWhitespace: false
       }
-    })
+    }),
   ],
   resolve: {
     extensions: ['.js', '.ts']
@@ -28,11 +28,6 @@ module.exports = {
         exclude: /(node_modules)/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/preset-env'
-            ]
-          }
         }
       },
       {
@@ -46,7 +41,8 @@ module.exports = {
 
   },
   devServer: {
-    open: true
+    open: true,
+    disableHostCheck: true
   }
 };
 

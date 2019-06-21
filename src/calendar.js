@@ -1,3 +1,7 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import "whatwg-fetch";
+
 let events;
 let eventDates = [];
 let cache = []; //TODO: Update cache to include year
@@ -7,18 +11,22 @@ let plzwait = false;
 // populate values from URL
 // TODO: populate values from HTTP URL Request
 const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
-const url = 'https://bookings.goape.co.uk/BatterseaPark/';
+const url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
 
 const today = new Date();
-const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
-const endDate =  today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
+//TODO: Ensure all dates are in a format for IE
+const startDate = today.getFullYear() + "-06-01";
+const endDate =  today.getFullYear() + "-06-31"
 
 getJsonFeed(startDate, endDate);
 function getJsonFeed(fromDate, toDate) {
+    console.log(fromDate);
     const month = new Date(fromDate).getMonth();
+    console.log(month);
     const year = new Date(fromDate).getFullYear();
-
+    console.log("getting feed");
     let checkMonth = $.inArray(month, cache) === -1;
+    console.log (checkMonth, month);
     if (checkMonth && (month < 12)) {
         Promise.resolve(
             jQuery.ajax({
@@ -32,6 +40,7 @@ function getJsonFeed(fromDate, toDate) {
             })
         ).then(function (response) {
             cache.push(month);
+            console.log('got feed', response);
             let lastDay = lastDayOfMonth(year, month + 2);
             let newFrom = year + '-' + (month + 2) + '-' + '01';
             let newTo = year + '-' + (month + 2) + '-' + lastDay;
