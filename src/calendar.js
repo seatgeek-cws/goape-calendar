@@ -1,3 +1,10 @@
+const url_string = window.location.href;
+const url_obj = new URL(url_string);
+const showId = url_obj.searchParams.get('showid');
+const site = url_obj.pathname.split('/')[1];
+
+const url = 'https://' + url_obj.host + '/' + site + '/';
+
 let events;
 let eventDates = [];
 let cache = []; //TODO: Update cache to include year
@@ -6,12 +13,12 @@ let plzwait = false;
 
 // populate values from URL
 // TODO: populate values from HTTP URL Request
-const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
-const url = 'https://bookings.goape.co.uk/BatterseaPark/';
+//const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
+//const url = 'https://bookings.goape.co.uk/BatterseaPark/';
 
 const today = new Date();
 const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
-const endDate =  today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
+const endDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
 
 getJsonFeed(startDate, endDate);
 function getJsonFeed(fromDate, toDate) {
@@ -36,6 +43,7 @@ function getJsonFeed(fromDate, toDate) {
             let newFrom = year + '-' + (month + 2) + '-' + '01';
             let newTo = year + '-' + (month + 2) + '-' + lastDay;
             mapEventDates(response);
+            waitEnd();
             getJsonFeed(newFrom, newTo);
         }).catch(function (e) {
             console.log("error geting feed: " + e.statusText, e);
@@ -119,6 +127,8 @@ function buildTimeSlotsUI(eventFeed) {
 }
 
 function onChangeMonthYear(year, month, inst) {
+    //FIXME: When month has no events it timesout
+    
     if ($.inArray(month, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
     } else {
@@ -132,13 +142,19 @@ function lastDayOfMonth(year, month) {
 
 function pleaseWait() {
     plzwait = true;
-    $('.message-container h2').text("Please wait ....");
+    pleaseWaitDlg = showPleaseWait();
 }
 
 function waitEnd() {
-    if (plzwait) {
-        plzwait = false;
-        $('.message-container h2').text("Loaded");
-        $('.date_picker').datepicker("refresh");
-    }
+    plzwait = false;
+    hidePleaseWait();
+    $('.date_picker').datepicker("refresh");
+}
+
+$.fn.scrollView = function () {
+    return this.each(function () {
+        $('html, body').animate({
+            scrollTop: $(this).offset().top
+        }, 1000);
+    });
 }
