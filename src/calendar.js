@@ -14,11 +14,9 @@ const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01
 const endDate =  today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
 
 getJsonFeed(startDate, endDate);
-// TODO: Remove Callback references when on server
 function getJsonFeed(fromDate, toDate) {
     const month = new Date(fromDate).getMonth();
     const year = new Date(fromDate).getFullYear();
-    // TODO: Activate please wait
 
     let checkMonth = $.inArray(month, cache) === -1;
     if (checkMonth && (month < 12)) {
