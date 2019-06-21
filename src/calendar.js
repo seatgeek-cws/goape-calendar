@@ -1,6 +1,12 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import "whatwg-fetch";
+const url_string = window.location.href;
+const url_obj = new URL(url_string);
+const showId = url_obj.searchParams.get('showid');
+const site = url_obj.pathname.split('/')[1];
+
+const url = 'https://' + url_obj.host + '/' + site + '/';
 
 let events;
 let eventDates = [];
@@ -26,8 +32,10 @@ function getJsonFeed(fromDate, toDate) {
     const year = new Date(fromDate).getFullYear();
     console.log("getting feed");
     let checkMonth = $.inArray(month, cache) === -1;
-    console.log (checkMonth, month);
-    if (checkMonth && (month < 12)) {
+
+    //FIXME: Time out on last month selection: https://uat-bookings.goape.co.uk/WoburnSafariPark/custom/calendartest.aspx?showid=6d8f7883-3140-e911-80e8-00505601004c&interface=37
+    //FIXME: Time out if going back a month where no events present
+    if (checkMonth && (month < 13)) {
         Promise.resolve(
             jQuery.ajax({
                 type: "GET",
@@ -45,6 +53,7 @@ function getJsonFeed(fromDate, toDate) {
             let newFrom = year + '-' + (month + 2) + '-' + '01';
             let newTo = year + '-' + (month + 2) + '-' + lastDay;
             mapEventDates(response);
+            waitEnd();
             getJsonFeed(newFrom, newTo);
         }).catch(function (e) {
             console.log("error geting feed: " + e.statusText, e);
@@ -128,6 +137,8 @@ function buildTimeSlotsUI(eventFeed) {
 }
 
 function onChangeMonthYear(year, month, inst) {
+    //FIXME: When month has no events it timesout
+    
     if ($.inArray(month, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
     } else {
@@ -141,13 +152,19 @@ function lastDayOfMonth(year, month) {
 
 function pleaseWait() {
     plzwait = true;
-    $('.message-container h2').text("Please wait ....");
+    pleaseWaitDlg = showPleaseWait();
 }
 
 function waitEnd() {
-    if (plzwait) {
-        plzwait = false;
-        $('.message-container h2').text("Loaded");
-        $('.date_picker').datepicker("refresh");
-    }
+    plzwait = false;
+    hidePleaseWait();
+    $('.date_picker').datepicker("refresh");
+}
+
+$.fn.scrollView = function () {
+    return this.each(function () {
+        $('html, body').animate({
+            scrollTop: $(this).offset().top
+        }, 1000);
+    });
 }

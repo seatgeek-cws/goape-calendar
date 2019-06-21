@@ -1,5 +1,9 @@
 Arguments: 
+<<<<<<< HEAD
   C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add whatwe-fetch
+=======
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add @babel/plugin-transsform-runtime --save-dev
+>>>>>>> eSRO-version
 
 PATH: 
   C:\Users\Nicholas.mckenna\Downloads\cmder\bin;C:\Users\Nicholas.mckenna\Downloads\cmder\vendor\bin;C:\Users\Nicholas.mckenna\Downloads\cmder\vendor\conemu-maximus5\ConEmu\Scripts;C:\Users\Nicholas.mckenna\Downloads\cmder\vendor\conemu-maximus5;C:\Users\Nicholas.mckenna\Downloads\cmder\vendor\conemu-maximus5\ConEmu;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\Git\cmd;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;c:\Program Files (x86)\Microsoft SQL Server\90\Tools\binn\;C:\Users\Nicholas.mckenna\AppData\Local\Microsoft\WindowsApps;C:\Users\Nicholas.mckenna\AppData\Roaming\npm;C:\Users\Nicholas.mckenna\AppData\Local\Yarn\bin;C:\Users\Nicholas.mckenna\AppData\Local\Keybase\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\Nicholas.mckenna\Downloads\cmder
@@ -14,7 +18,11 @@ Platform:
   win32 x64
 
 Trace: 
+<<<<<<< HEAD
   Error: https://registry.yarnpkg.com/whatwe-fetch: Not found
+=======
+  Error: https://registry.yarnpkg.com/@babel%2fplugin-transsform-runtime: Not found
+>>>>>>> eSRO-version
       at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:65200:18)
       at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:129590:22)
       at Request.emit (events.js:198:13)
@@ -56,6 +64,7 @@ npm manifest:
       "build": "webpack --mode production"
     },
     "dependencies": {
+<<<<<<< HEAD
       "@babel/polyfill": "^7.4.4",
       "@babel/register": "^7.4.4",
       "core-js": "^3.1.4",
@@ -63,6 +72,18 @@ npm manifest:
       "promise-polyfill": "^8.1.3",
       "regenerator-runtime": "^0.13.2",
       "source-map": "^0.7.3"
+=======
+      "babel-plugin-array-includes": "^2.0.3",
+      "babel-plugin-syntax-dynamic-import": "^6.18.0",
+      "babel-plugin-transform-class-properties": "^6.24.1",
+      "babel-plugin-transform-object-assign": "^6.22.0",
+      "babel-plugin-transform-object-rest-spread": "^6.26.0",
+      "babel-plugin-transform-runtime": "^6.23.0",
+      "babel-polyfill": "^6.26.0",
+      "jQuery": "^1.7.4",
+      "source-map": "^0.7.3",
+      "url-search-params-polyfill": "^6.0.0"
+>>>>>>> eSRO-version
     }
   }
 
@@ -1133,6 +1154,28 @@ Lockfile:
       source-map "^0.5.7"
       trim-right "^1.0.1"
   
+<<<<<<< HEAD
+=======
+  babel-helper-function-name@^6.24.1:
+    version "6.24.1"
+    resolved "https://registry.yarnpkg.com/babel-helper-function-name/-/babel-helper-function-name-6.24.1.tgz#d3475b8c03ed98242a25b48351ab18399d3580a9"
+    integrity sha1-00dbjAPtmCQqJbSDUasYOZ01gKk=
+    dependencies:
+      babel-helper-get-function-arity "^6.24.1"
+      babel-runtime "^6.22.0"
+      babel-template "^6.24.1"
+      babel-traverse "^6.24.1"
+      babel-types "^6.24.1"
+  
+  babel-helper-get-function-arity@^6.24.1:
+    version "6.24.1"
+    resolved "https://registry.yarnpkg.com/babel-helper-get-function-arity/-/babel-helper-get-function-arity-6.24.1.tgz#8f7782aa93407c41d3aa50908f89b031b1b6853d"
+    integrity sha1-j3eCqpNAfEHTqlCQj4mwMbG2hT0=
+    dependencies:
+      babel-runtime "^6.22.0"
+      babel-types "^6.24.1"
+  
+>>>>>>> eSRO-version
   babel-helpers@^6.24.1:
     version "6.24.1"
     resolved "https://registry.yarnpkg.com/babel-helpers/-/babel-helpers-6.24.1.tgz#3471de9caec388e5c850e597e58a26ddf37602b2"
@@ -1158,6 +1201,54 @@ Lockfile:
     dependencies:
       babel-runtime "^6.22.0"
   
+<<<<<<< HEAD
+=======
+  babel-plugin-array-includes@^2.0.3:
+    version "2.0.3"
+    resolved "https://registry.yarnpkg.com/babel-plugin-array-includes/-/babel-plugin-array-includes-2.0.3.tgz#cf5452e81c7b803fb7959f1045ac88e2ec28ff76"
+    integrity sha1-z1RS6Bx7gD+3lZ8QRayI4uwo/3Y=
+  
+  babel-plugin-syntax-class-properties@^6.8.0:
+    version "6.13.0"
+    resolved "https://registry.yarnpkg.com/babel-plugin-syntax-class-properties/-/babel-plugin-syntax-class-properties-6.13.0.tgz#d7eb23b79a317f8543962c505b827c7d6cac27de"
+    integrity sha1-1+sjt5oxf4VDlixQW4J8fWysJ94=
+  
+  babel-plugin-syntax-dynamic-import@^6.18.0:
+    version "6.18.0"
+    resolved "https://registry.yarnpkg.com/babel-plugin-syntax-dynamic-import/-/babel-plugin-syntax-dynamic-import-6.18.0.tgz#8d6a26229c83745a9982a441051572caa179b1da"
+    integrity sha1-jWomIpyDdFqZgqRBBRVyyqF5sdo=
+  
+  babel-plugin-syntax-object-rest-spread@^6.8.0:
+    version "6.13.0"
+    resolved "https://registry.yarnpkg.com/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.13.0.tgz#fd6536f2bce13836ffa3a5458c4903a597bb3bf5"
+    integrity sha1-/WU28rzhODb/o6VFjEkDpZe7O/U=
+  
+  babel-plugin-transform-class-properties@^6.24.1:
+    version "6.24.1"
+    resolved "https://registry.yarnpkg.com/babel-plugin-transform-class-properties/-/babel-plugin-transform-class-properties-6.24.1.tgz#6a79763ea61d33d36f37b611aa9def81a81b46ac"
+    integrity sha1-anl2PqYdM9NvN7YRqp3vgagbRqw=
+    dependencies:
+      babel-helper-function-name "^6.24.1"
+      babel-plugin-syntax-class-properties "^6.8.0"
+      babel-runtime "^6.22.0"
+      babel-template "^6.24.1"
+  
+  babel-plugin-transform-object-assign@^6.22.0:
+    version "6.22.0"
+    resolved "https://registry.yarnpkg.com/babel-plugin-transform-object-assign/-/babel-plugin-transform-object-assign-6.22.0.tgz#f99d2f66f1a0b0d498e346c5359684740caa20ba"
+    integrity sha1-+Z0vZvGgsNSY40bFNZaEdAyqILo=
+    dependencies:
+      babel-runtime "^6.22.0"
+  
+  babel-plugin-transform-object-rest-spread@^6.26.0:
+    version "6.26.0"
+    resolved "https://registry.yarnpkg.com/babel-plugin-transform-object-rest-spread/-/babel-plugin-transform-object-rest-spread-6.26.0.tgz#0f36692d50fef6b7e2d4b3ac1478137a963b7b06"
+    integrity sha1-DzZpLVD+9rfi1LOsFHgTepY7ewY=
+    dependencies:
+      babel-plugin-syntax-object-rest-spread "^6.8.0"
+      babel-runtime "^6.26.0"
+  
+>>>>>>> eSRO-version
   babel-plugin-transform-regenerator@^6.26.0:
     version "6.26.0"
     resolved "https://registry.yarnpkg.com/babel-plugin-transform-regenerator/-/babel-plugin-transform-regenerator-6.26.0.tgz#e0703696fbde27f0a3efcacf8b4dca2f7b3a8f2f"
@@ -1165,6 +1256,25 @@ Lockfile:
     dependencies:
       regenerator-transform "^0.10.0"
   
+<<<<<<< HEAD
+=======
+  babel-plugin-transform-runtime@^6.23.0:
+    version "6.23.0"
+    resolved "https://registry.yarnpkg.com/babel-plugin-transform-runtime/-/babel-plugin-transform-runtime-6.23.0.tgz#88490d446502ea9b8e7efb0fe09ec4d99479b1ee"
+    integrity sha1-iEkNRGUC6puOfvsP4J7E2ZR5se4=
+    dependencies:
+      babel-runtime "^6.22.0"
+  
+  babel-polyfill@^6.26.0:
+    version "6.26.0"
+    resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.26.0.tgz#379937abc67d7895970adc621f284cd966cf2153"
+    integrity sha1-N5k3q8Z9eJWXCtxiHyhM2WbPIVM=
+    dependencies:
+      babel-runtime "^6.26.0"
+      core-js "^2.5.0"
+      regenerator-runtime "^0.10.5"
+  
+>>>>>>> eSRO-version
   babel-register@^6.26.0:
     version "6.26.0"
     resolved "https://registry.yarnpkg.com/babel-register/-/babel-register-6.26.0.tgz#6ed021173e2fcb486d7acb45c6009a856f647071"
@@ -1197,7 +1307,11 @@ Lockfile:
       babylon "^6.18.0"
       lodash "^4.17.4"
   
+<<<<<<< HEAD
   babel-traverse@^6.26.0:
+=======
+  babel-traverse@^6.24.1, babel-traverse@^6.26.0:
+>>>>>>> eSRO-version
     version "6.26.0"
     resolved "https://registry.yarnpkg.com/babel-traverse/-/babel-traverse-6.26.0.tgz#46a9cbd7edcc62c8e5c064e2d2d8d0f4035766ee"
     integrity sha1-RqnL1+3MYsjlwGTi0tjQ9ANXZu4=
@@ -1212,7 +1326,11 @@ Lockfile:
       invariant "^2.2.2"
       lodash "^4.17.4"
   
+<<<<<<< HEAD
   babel-types@^6.19.0, babel-types@^6.26.0:
+=======
+  babel-types@^6.19.0, babel-types@^6.24.1, babel-types@^6.26.0:
+>>>>>>> eSRO-version
     version "6.26.0"
     resolved "https://registry.yarnpkg.com/babel-types/-/babel-types-6.26.0.tgz#a3b073f94ab49eb6fa55cd65227a334380632497"
     integrity sha1-o7Bz+Uq0nrb6Vc1lInozQ4BjJJc=
@@ -1754,16 +1872,23 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.1.3.tgz#4c90752d5b9471f641514f3728f51c1e0783d0b5"
     integrity sha512-k3JWTrcQBKqjkjI0bkfXS0lbpWPxYuHWfMMjC1VDmzU4Q58IwSbuXSo99YO/hUHlw/EB4AlfA2PVxOGkrIq6dA==
   
+<<<<<<< HEAD
   core-js@^2.4.0, core-js@^2.5.0, core-js@^2.6.5:
+=======
+  core-js@^2.4.0, core-js@^2.5.0:
+>>>>>>> eSRO-version
     version "2.6.9"
     resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.9.tgz#6b4b214620c834152e179323727fc19741b084f2"
     integrity sha512-HOpZf6eXmnl7la+cUdMnLvUxKNqLUzJvgIziQ0DiF3JwSImNphIqdGqzj6hIKyX04MmV0poclQ7+wjWvxQyR2A==
   
+<<<<<<< HEAD
   core-js@^3.0.0, core-js@^3.1.4:
     version "3.1.4"
     resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.1.4.tgz#3a2837fc48e582e1ae25907afcd6cf03b0cc7a07"
     integrity sha512-YNZN8lt82XIMLnLirj9MhKDFZHalwzzrL9YLt6eb0T5D0EDl4IQ90IGkua8mHbnxNrkj1d8hbdizMc0Qmg1WnQ==
   
+=======
+>>>>>>> eSRO-version
   core-util-is@~1.0.0:
     version "1.0.2"
     resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -4363,16 +4488,27 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.0.tgz#4a856ec4b56e4077c557589cae85e7a4c8869a11"
     integrity sha512-1G6jJVDWrt0rK99kBjvEtziZNCICAuvIPkSiUFIQxVP06RCVpq3dmDo2oi6ABpYaDYaTRr67BEhL8r1wgEZZKg==
   
+<<<<<<< HEAD
+=======
+  regenerator-runtime@^0.10.5:
+    version "0.10.5"
+    resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.10.5.tgz#336c3efc1220adcedda2c9fab67b5a7955a33658"
+    integrity sha1-M2w+/BIgrc7dosn6tntaeVWjNlg=
+  
+>>>>>>> eSRO-version
   regenerator-runtime@^0.11.0:
     version "0.11.1"
     resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
     integrity sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
   
+<<<<<<< HEAD
   regenerator-runtime@^0.13.2:
     version "0.13.2"
     resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.2.tgz#32e59c9a6fb9b1a4aff09b4930ca2d4477343447"
     integrity sha512-S/TQAZJO+D3m9xeN1WTI8dLKBBiRgXBlTJvbWjCThHWZj9EvHK70Ff50/tYj2J/fvBY6JtFVwRuazHN2E7M9BA==
   
+=======
+>>>>>>> eSRO-version
   regenerator-transform@^0.10.0:
     version "0.10.1"
     resolved "https://registry.yarnpkg.com/regenerator-transform/-/regenerator-transform-0.10.1.tgz#1e4996837231da8b7f3cf4114d71b5691a0680dd"
@@ -4786,7 +4922,11 @@ Lockfile:
     dependencies:
       source-map "^0.5.6"
   
+<<<<<<< HEAD
   source-map-support@^0.5.9, source-map-support@~0.5.10:
+=======
+  source-map-support@~0.5.10:
+>>>>>>> eSRO-version
     version "0.5.12"
     resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.12.tgz#b4f3b10d51857a5af0138d3ce8003b201613d599"
     integrity sha512-4h2Pbvyy15EE02G+JOZpUCmqWJuqrs+sEkzewTm++BPi7Hvn/HwcqLAcNxYAyI0x13CpPPn+kMjl+hplXMHITQ==
@@ -5226,6 +5366,11 @@ Lockfile:
     dependencies:
       querystringify "^2.1.1"
       requires-port "^1.0.0"
+  
+  url-search-params-polyfill@^6.0.0:
+    version "6.0.0"
+    resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-6.0.0.tgz#f5e5fc230d56125f5b0ba67d9cbcd6555fa347e3"
+    integrity sha512-69Bl5s3SiEgcHe8SMpzLGOyag27BQeTeSaP/CfVHkKc/VdUHtNjaP2PnhshFVC021221ItueOzuMMGofZ/HDmQ==
   
   url@^0.11.0:
     version "0.11.0"
