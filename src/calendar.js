@@ -1,8 +1,11 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import "whatwg-fetch";
+
 const url_string = window.location.href;
 const url_obj = new URL(url_string);
 const showId = url_obj.searchParams.get('showid');
 const site = url_obj.pathname.split('/')[1];
-
 const url = 'https://' + url_obj.host + '/' + site + '/';
 
 let events;
@@ -10,6 +13,13 @@ let eventDates = [];
 let cache = []; //TODO: Update cache to include year
 let initialLoad = true;
 let plzwait = false;
+
+// populate values from URL
+// TODO: populate values from HTTP URL Request
+
+/* Quick edits */
+//showId = '8a4e7b03-893e-e911-80e8-00505601004c';
+//url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
 
 const today = new Date();
 const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
@@ -21,6 +31,8 @@ function getJsonFeed(fromDate, toDate) {
     const year = new Date(fromDate).getFullYear();
 
     let checkMonth = $.inArray(month, cache) === -1;
+
+    //pleaseWait();
 
     //FIXME: Time out on last month selection: https://uat-bookings.goape.co.uk/WoburnSafariPark/custom/calendartest.aspx?showid=6d8f7883-3140-e911-80e8-00505601004c&interface=37
     //FIXME: Time out if going back a month where no events present
