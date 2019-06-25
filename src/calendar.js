@@ -1,64 +1,39 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
-import "whatwg-fetch";
-<<<<<<< HEAD
-=======
-
->>>>>>> esro-version
-const url_string = window.location.href;
-const url_obj = new URL(url_string);
-const showId = url_obj.searchParams.get('showid');
-const site = url_obj.pathname.split('/')[1];
-<<<<<<< HEAD
-
-=======
->>>>>>> esro-version
-const url = 'https://' + url_obj.host + '/' + site + '/';
-
-let events;
-let eventDates = [];
-let cache = []; //TODO: Update cache to include year
-let initialLoad = true;
-let plzwait = false;
-
-// populate values from URL
-// TODO: populate values from HTTP URL Request
-<<<<<<< HEAD
-const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
-const url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
-
-const today = new Date();
-//TODO: Ensure all dates are in a format for IE
-const startDate = today.getFullYear() + "-06-01";
-const endDate =  today.getFullYear() + "-06-31"
-=======
-
 /* Quick edits */
 //showId = '8a4e7b03-893e-e911-80e8-00505601004c';
 //url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
 
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import "whatwg-fetch";
+
+const url_string = window.location.href;
+const url_obj = new URL(url_string);
+const showId = url_obj.searchParams.get('showid');
+const site = url_obj.pathname.split('/')[1];
+const url = 'https://' + url_obj.host + '/' + site + '/';
+const preloadMonths = 3;
+
 const today = new Date();
 const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
 const endDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
->>>>>>> esro-version
 
+let plzwait = false;
+let gettingFeed = false;
+let events;
+let eventDates = [];
+let cache = [];
+let monthsAdded = 0;
+
+// Initial call of Feeds
 getJsonFeed(startDate, endDate);
+
 function getJsonFeed(fromDate, toDate) {
-    console.log(fromDate);
     const month = new Date(fromDate).getMonth();
-    console.log(month);
     const year = new Date(fromDate).getFullYear();
-    console.log("getting feed");
-    let checkMonth = $.inArray(month, cache) === -1;
+    const checkMonth = $.inArray(month, cache) === -1;
 
-<<<<<<< HEAD
-=======
-    //pleaseWait();
-
->>>>>>> esro-version
-    //FIXME: Time out on last month selection: https://uat-bookings.goape.co.uk/WoburnSafariPark/custom/calendartest.aspx?showid=6d8f7883-3140-e911-80e8-00505601004c&interface=37
-    //FIXME: Time out if going back a month where no events present
-    if (checkMonth && (month < 13)) {
+    if (checkMonth && (month < 12)) {
+        console.log("getting feed.....");
         Promise.resolve(
             jQuery.ajax({
                 type: "GET",
@@ -71,15 +46,25 @@ function getJsonFeed(fromDate, toDate) {
             })
         ).then(function (response) {
             cache.push(month);
-            console.log('got feed', response);
-            let lastDay = lastDayOfMonth(year, month + 2);
-            let newFrom = year + '-' + (month + 2) + '-' + '01';
-            let newTo = year + '-' + (month + 2) + '-' + lastDay;
-            mapEventDates(response);
+            monthsAdded++;
+            console.log("feed retrieved");
+
+            if (response.feed.EventsCount > 0)
+                mapEventDates(response);
+
             waitEnd();
-            getJsonFeed(newFrom, newTo);
+            
+            let newMonth = (month === 11) ? 0 : month + 1;
+            let newYear = (month === 11) ? year + 1 : year;
+            
+            if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
+                let lastDay = lastDayOfMonth(newYear, newMonth + 1);
+                let newFrom = newYear + '-' + (newMonth + 1) + '-' + '01';
+                let newTo = newYear + '-' + (newMonth + 1) + '-' + lastDay;  
+                getJsonFeed(newFrom, newTo);
+            }
         }).catch(function (e) {
-            console.log("error geting feed: " + e.statusText, e);
+            console.log("error geting feed: " + e.statusText, "Error message: ", e.message, e);
         });
     }
 }
@@ -87,6 +72,7 @@ function getJsonFeed(fromDate, toDate) {
 function mapEventDates(callback) {
     events = callback.feed.Events.Event;
     let tempEventDates = [];
+
     for (let i = 0; i < events.length; i++) {
         tempEventDates.push((new Date(events[i].ActualEventDate)).setHours(0, 0, 0, 0).valueOf());
     }
@@ -111,7 +97,6 @@ function setupDatePicker() {
         dayNamesMin: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         firstDay: 1
     });
-    initialLoad = false;
 }
 
 function beforeShowDay(date) {
@@ -150,9 +135,33 @@ function buildTimeSlotsUI(eventFeed) {
 
     let eventsAvailablity = eventFeed.feed.data.Events.Event;
     for (let i = 0; i < eventsAvailablity.length; i++) {
-        let eventLink = document.createElement('div');
+        const eventLink = document.createElement('div');
+        const availableCapacity = parseInt(eventsAvailablity[i].AvailableCapacity, 10);
+        const time = eventsAvailablity[i].ActualEventDate.split('T')[1];
 
-        eventLink.innerHTML = '<a href=' + url + 'loader.aspx/?target=hall.aspx%3Fevent%3D' + eventsAvailablity[i].EventLocalId + '>' + '<div class="slot"><div class="time">' + eventsAvailablity[i].ActualEventDate + '</div><div class="capacity">' + eventsAvailablity[i].AvailableCapacity + '</div></a>';
+        if (availableCapacity === 0) {
+            eventLink.innerHTML = '<div class="slot"><div class="time">' + 
+                time + '</div><div class="capacity">' + 
+                eventsAvailablity[i].AvailableCapacity + 
+                '</div></div>';
+            eventLink.classList.add('timeslot', 'SoldOut');
+        } else {
+            eventLink.innerHTML = '<a href=' + url + 'loader.aspx/?target=hall.aspx%3Fevent%3D' + 
+                eventsAvailablity[i].EventLocalId + '>' + 
+                '<div class="slot"><div class="time">' + 
+                time + 
+                '</div><div class="capacity">' + 
+                eventsAvailablity[i].AvailableCapacity + 
+                '</div></div></a>';
+
+            let eventClass;
+            if (availableCapacity <= 4)
+                eventClass = "HighSeatsOccupancy";
+            else
+                eventClass = "LowSeatsOccupation";
+            eventLink.classList.add('timeslot', eventClass);
+        }
+        
         fragment.appendChild(eventLink);
     }
 
@@ -160,11 +169,18 @@ function buildTimeSlotsUI(eventFeed) {
 }
 
 function onChangeMonthYear(year, month, inst) {
-    //FIXME: When month has no events it timesout
-    
-    if ($.inArray(month, cache) !== -1) {
+    console.log("onChangeMonth: ", monthsAdded);
+    if ($.inArray(month - 1, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
+        if (monthsAdded === 3) {
+            monthsAdded == 0;
+            const nextMonth = year + '-' + (month + 2) + '-' + '01';
+            const endOfMonth = year + '-' + (month + 2) + '-' + lastDayOfMonth(year, month);
+            console.log(nextMonth, endOfMonth);
+            getJsonFeed(nextMonth, endOfMonth);
+        }
     } else {
+        // On month change add next 1 month to caching queue
         pleaseWait();
     }
 }
