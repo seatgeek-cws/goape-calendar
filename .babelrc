@@ -1,25 +1,15 @@
 {
-<<<<<<< HEAD
-    
-    "presets": [
-        ["@babel/env", {
-            "useBuiltIns": "usage",
-            "corejs" : 3,
-            "debug": true
-        }],
-    
-      ],
-      "plugins": [
-        "transform-regenerator"
-=======
-    "presets": [
-      ["@babel/preset-env", {
-        "useBuiltIns": false,
-      }],
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "useBuiltIns": "usage",
+        "corejs": 3,
+        "debug": true
+      }
     ],
-    "plugins": [
-      "@babel/plugin-transform-runtime",
-      "@babel/plugin-transform-classes"
->>>>>>> eSRO-version
-    ]
-  }
+  ],
+  "plugins": [
+    "transform-regenerator"
+  ]
+}

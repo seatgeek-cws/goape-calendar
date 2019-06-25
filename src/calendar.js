@@ -1,11 +1,18 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import "whatwg-fetch";
+<<<<<<< HEAD
+=======
+
+>>>>>>> esro-version
 const url_string = window.location.href;
 const url_obj = new URL(url_string);
 const showId = url_obj.searchParams.get('showid');
 const site = url_obj.pathname.split('/')[1];
+<<<<<<< HEAD
 
+=======
+>>>>>>> esro-version
 const url = 'https://' + url_obj.host + '/' + site + '/';
 
 let events;
@@ -16,6 +23,7 @@ let plzwait = false;
 
 // populate values from URL
 // TODO: populate values from HTTP URL Request
+<<<<<<< HEAD
 const showId = '8a4e7b03-893e-e911-80e8-00505601004c';
 const url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
 
@@ -23,6 +31,16 @@ const today = new Date();
 //TODO: Ensure all dates are in a format for IE
 const startDate = today.getFullYear() + "-06-01";
 const endDate =  today.getFullYear() + "-06-31"
+=======
+
+/* Quick edits */
+//showId = '8a4e7b03-893e-e911-80e8-00505601004c';
+//url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
+
+const today = new Date();
+const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
+const endDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
+>>>>>>> esro-version
 
 getJsonFeed(startDate, endDate);
 function getJsonFeed(fromDate, toDate) {
@@ -33,6 +51,11 @@ function getJsonFeed(fromDate, toDate) {
     console.log("getting feed");
     let checkMonth = $.inArray(month, cache) === -1;
 
+<<<<<<< HEAD
+=======
+    //pleaseWait();
+
+>>>>>>> esro-version
     //FIXME: Time out on last month selection: https://uat-bookings.goape.co.uk/WoburnSafariPark/custom/calendartest.aspx?showid=6d8f7883-3140-e911-80e8-00505601004c&interface=37
     //FIXME: Time out if going back a month where no events present
     if (checkMonth && (month < 13)) {
