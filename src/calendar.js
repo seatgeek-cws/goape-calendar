@@ -1,7 +1,6 @@
 /* Quick edits */
 //showId = '8a4e7b03-893e-e911-80e8-00505601004c';
 //url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
-
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import "whatwg-fetch";
@@ -18,7 +17,6 @@ const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01
 const endDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
 
 let plzwait = false;
-let gettingFeed = false;
 let events;
 let eventDates = [];
 let cache = [];
@@ -66,6 +64,8 @@ function getJsonFeed(fromDate, toDate) {
         }).catch(function (e) {
             console.log("error geting feed: " + e.statusText, "Error message: ", e.message, e);
         });
+    } else {
+        waitEnd();
     }
 }
 
@@ -172,16 +172,16 @@ function onChangeMonthYear(year, month, inst) {
     console.log("onChangeMonth: ", monthsAdded);
     if ($.inArray(month - 1, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
+    } else if (month -1 > cache[0]) {
+        // On month change add next 1 month to caching queue
+        pleaseWait();
         if (monthsAdded === 3) {
-            monthsAdded == 0;
-            const nextMonth = year + '-' + (month + 2) + '-' + '01';
-            const endOfMonth = year + '-' + (month + 2) + '-' + lastDayOfMonth(year, month);
+            monthsAdded = 0;
+            const nextMonth = year + '-' + month + '-' + '01';
+            const endOfMonth = year + '-' + month + '-' + lastDayOfMonth(year, month);
             console.log(nextMonth, endOfMonth);
             getJsonFeed(nextMonth, endOfMonth);
         }
-    } else {
-        // On month change add next 1 month to caching queue
-        pleaseWait();
     }
 }
 
