@@ -8,13 +8,15 @@ import "whatwg-fetch";
 const url_string = window.location.href;
 const url_obj = new URL(url_string);
 const showId = url_obj.searchParams.get('showid');
+const show = url_obj.searchParams.get('adv');
+const location = url_obj.searchParams.get('loc');
 const site = url_obj.pathname.split('/')[1];
 const url = 'https://' + url_obj.host + '/' + site + '/';
 const preloadMonths = 3;
 
 const today = new Date();
-const startDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + "01";
-const endDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
+const startDate = today.getFullYear() + "-" + (("0" + (today.getMonth() + 1)).slice(-2)) + "-" + "01";
+const endDate = today.getFullYear() + "-" + (("0" + (today.getMonth() + 1)).slice(-2)) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
 
 let plzwait = false;
 let events;
@@ -24,6 +26,8 @@ let monthsAdded = 0;
 
 // Initial call of Feeds
 getJsonFeed(startDate, endDate);
+const title = document.getElementsByClassName('event-title')[0];
+title.innerHTML = '<h2>' + show + ' - ' + location + '</h2>';
 
 function getJsonFeed(fromDate, toDate) {
     const month = new Date(fromDate).getMonth();
@@ -31,7 +35,6 @@ function getJsonFeed(fromDate, toDate) {
     const checkMonth = $.inArray(month, cache) === -1;
 
     if (checkMonth && (month < 12)) {
-        console.log("getting feed.....");
         Promise.resolve(
             jQuery.ajax({
                 type: "GET",
@@ -56,9 +59,11 @@ function getJsonFeed(fromDate, toDate) {
             let newYear = (month === 11) ? year + 1 : year;
             
             if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
+                console.log("loading new feed");
                 let lastDay = lastDayOfMonth(newYear, newMonth + 1);
-                let newFrom = newYear + '-' + (newMonth + 1) + '-' + '01';
-                let newTo = newYear + '-' + (newMonth + 1) + '-' + lastDay;  
+                let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
+                let newTo = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + lastDay;  
+                console.log(newFrom, newTo);
                 getJsonFeed(newFrom, newTo);
             }
         }).catch(function (e) {
@@ -137,21 +142,23 @@ function buildTimeSlotsUI(eventFeed) {
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
         const availableCapacity = parseInt(eventsAvailablity[i].AvailableCapacity, 10);
-        const time = eventsAvailablity[i].ActualEventDate.split('T')[1];
+        const timeWithSeconds = eventsAvailablity[i].ActualEventDate.split('T')[1];
+        const time = timeWithSeconds.split(':', 2).join(':');
 
         if (availableCapacity === 0) {
             eventLink.innerHTML = '<div class="slot"><div class="time">' + 
                 time + '</div><div class="capacity">' + 
-                eventsAvailablity[i].AvailableCapacity + 
+                eventsAvailablity[i].AvailableCapacity + ' spaces' +
                 '</div></div>';
-            eventLink.classList.add('timeslot', 'SoldOut');
+            eventLink.classList.add('timeslot');
+            eventLink.classList.add('SoldOut');
         } else {
             eventLink.innerHTML = '<a href=' + url + 'loader.aspx/?target=hall.aspx%3Fevent%3D' + 
                 eventsAvailablity[i].EventLocalId + '>' + 
                 '<div class="slot"><div class="time">' + 
                 time + 
                 '</div><div class="capacity">' + 
-                eventsAvailablity[i].AvailableCapacity + 
+                eventsAvailablity[i].AvailableCapacity + ' spaces'
                 '</div></div></a>';
 
             let eventClass;
@@ -159,7 +166,8 @@ function buildTimeSlotsUI(eventFeed) {
                 eventClass = "HighSeatsOccupancy";
             else
                 eventClass = "LowSeatsOccupation";
-            eventLink.classList.add('timeslot', eventClass);
+            eventLink.classList.add('timeslot');
+            eventLink.classList.add(eventClass);
         }
         
         fragment.appendChild(eventLink);
@@ -177,8 +185,8 @@ function onChangeMonthYear(year, month, inst) {
         pleaseWait();
         if (monthsAdded === 3) {
             monthsAdded = 0;
-            const nextMonth = year + '-' + month + '-' + '01';
-            const endOfMonth = year + '-' + month + '-' + lastDayOfMonth(year, month);
+            const nextMonth = year + '-' + (("0" + (month)).slice(-2)) + '-' + '01';
+            const endOfMonth = year + '-' + (("0" + (month)).slice(-2)) + '-' + lastDayOfMonth(year, month);
             console.log(nextMonth, endOfMonth);
             getJsonFeed(nextMonth, endOfMonth);
         }
@@ -186,7 +194,9 @@ function onChangeMonthYear(year, month, inst) {
 }
 
 function lastDayOfMonth(year, month) {
-    return new Date(year, month, 0).getDate();
+    console.log("cache test");
+    const newDate = new Date(year, month, 0);
+    return ("0" + newDate.getDate()).slice(-2);
 }
 
 function pleaseWait() {
@@ -196,7 +206,7 @@ function pleaseWait() {
 
 function waitEnd() {
     plzwait = false;
-    hidePleaseWait();
+    window.hidePleaseWait();
     $('.date_picker').datepicker("refresh");
 }
 

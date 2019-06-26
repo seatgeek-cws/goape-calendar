@@ -21,6 +21,7 @@
     "webpack-dev-server": "^3.5.1",
     "webpack-merge": "^4.2.1"
   },
+  "browserslist": "> 0.5%, not dead",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "dev": "webpack --mode development",
