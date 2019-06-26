@@ -13,6 +13,10 @@ const location = url_obj.searchParams.get('loc');
 const site = url_obj.pathname.split('/')[1];
 const url = 'https://' + url_obj.host + '/' + site + '/';
 const preloadMonths = 3;
+const times = document.getElementById('times');
+const eventTimesContainer = document.getElementsByClassName('event-times')[0];
+
+console.log(times, eventTimesContainer);
 
 const today = new Date();
 const startDate = today.getFullYear() + "-" + (("0" + (today.getMonth() + 1)).slice(-2)) + "-" + "01";
@@ -127,7 +131,7 @@ function getEventsAvailability(fromDate, toDate) {
 function buildTimeSlotsUI(eventFeed) {
     let legend = false;
     let fragment = document.createDocumentFragment();
-    let eventTimesContainer = document.getElementsByClassName('event-times')[0];
+    
 
     if (!legend) {
         $('.time-legend').show();
@@ -174,9 +178,17 @@ function buildTimeSlotsUI(eventFeed) {
     }
 
     eventTimesContainer.appendChild(fragment);
+    times.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+}
+
+function clearTimes() {
+    while (eventTimesContainer.firstChild) {
+        eventTimesContainer.removeChild(eventTimesContainer.firstChild);
+    }
 }
 
 function onChangeMonthYear(year, month, inst) {
+    clearTimes();
     console.log("onChangeMonth: ", monthsAdded);
     if ($.inArray(month - 1, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
@@ -210,10 +222,4 @@ function waitEnd() {
     $('.date_picker').datepicker("refresh");
 }
 
-$.fn.scrollView = function () {
-    return this.each(function () {
-        $('html, body').animate({
-            scrollTop: $(this).offset().top
-        }, 1000);
-    });
-}
+
