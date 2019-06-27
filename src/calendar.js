@@ -1,6 +1,3 @@
-/* Quick edits */
-//showId = '8a4e7b03-893e-e911-80e8-00505601004c';
-//url = 'https://uat-bookings.goape.co.uk/BatterseaPark/';
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import "whatwg-fetch";
@@ -9,14 +6,17 @@ const url_string = window.location.href;
 const url_obj = new URL(url_string);
 const showId = url_obj.searchParams.get('showid');
 const show = url_obj.searchParams.get('adv');
-const location = url_obj.searchParams.get('loc');
+let location = url_obj.searchParams.get('loc');
+// hot fix for bookings bar loading different cases for location
+if (location === null) {
+    location = url_obj.searchParams.get('Loc');
+}
+
 const site = url_obj.pathname.split('/')[1];
 const url = 'https://' + url_obj.host + '/' + site + '/';
-const preloadMonths = 3;
+const preloadMonths = 2;
 const times = document.getElementById('times');
 const eventTimesContainer = document.getElementsByClassName('event-times')[0];
-
-console.log(times, eventTimesContainer);
 
 const today = new Date();
 const startDate = today.getFullYear() + "-" + (("0" + (today.getMonth() + 1)).slice(-2)) + "-" + "01";
@@ -30,6 +30,7 @@ let monthsAdded = 0;
 
 // Initial call of Feeds
 getJsonFeed(startDate, endDate);
+
 const title = document.getElementsByClassName('event-title')[0];
 title.innerHTML = '<h2>' + show + ' - ' + location + '</h2>';
 
@@ -52,7 +53,6 @@ function getJsonFeed(fromDate, toDate) {
         ).then(function (response) {
             cache.push(month);
             monthsAdded++;
-            console.log("feed retrieved");
 
             if (response.feed.EventsCount > 0)
                 mapEventDates(response);
@@ -63,11 +63,9 @@ function getJsonFeed(fromDate, toDate) {
             let newYear = (month === 11) ? year + 1 : year;
             
             if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
-                console.log("loading new feed");
                 let lastDay = lastDayOfMonth(newYear, newMonth + 1);
                 let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
                 let newTo = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + lastDay;  
-                console.log(newFrom, newTo);
                 getJsonFeed(newFrom, newTo);
             }
         }).catch(function (e) {
@@ -132,7 +130,6 @@ function buildTimeSlotsUI(eventFeed) {
     let legend = false;
     let fragment = document.createDocumentFragment();
     
-
     if (!legend) {
         $('.time-legend').show();
         legend = true;
@@ -173,7 +170,7 @@ function buildTimeSlotsUI(eventFeed) {
             eventLink.classList.add('timeslot');
             eventLink.classList.add(eventClass);
         }
-        
+    
         fragment.appendChild(eventLink);
     }
 
@@ -189,24 +186,20 @@ function clearTimes() {
 
 function onChangeMonthYear(year, month, inst) {
     clearTimes();
-    console.log("onChangeMonth: ", monthsAdded);
     if ($.inArray(month - 1, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
     } else if (month -1 > cache[0]) {
-        // On month change add next 1 month to caching queue
         pleaseWait();
-        if (monthsAdded === 3) {
+        if (monthsAdded === preloadMonths) {
             monthsAdded = 0;
             const nextMonth = year + '-' + (("0" + (month)).slice(-2)) + '-' + '01';
             const endOfMonth = year + '-' + (("0" + (month)).slice(-2)) + '-' + lastDayOfMonth(year, month);
-            console.log(nextMonth, endOfMonth);
             getJsonFeed(nextMonth, endOfMonth);
         }
     }
 }
 
 function lastDayOfMonth(year, month) {
-    console.log("cache test");
     const newDate = new Date(year, month, 0);
     return ("0" + newDate.getDate()).slice(-2);
 }
@@ -218,8 +211,17 @@ function pleaseWait() {
 
 function waitEnd() {
     plzwait = false;
-    window.hidePleaseWait();
+
+    if (typeof window.hidePleaseWait === 'function') {
+        window.hidePleaseWait();
+    } else {
+        let checkFunction = setInterval(function() {
+            if (typeof window.hidePleaseWait === 'function') {
+                window.hidePleaseWait();
+                clearInterval(checkFunction);
+            }
+        }, 100);
+    }
+  
     $('.date_picker').datepicker("refresh");
 }
-
-
