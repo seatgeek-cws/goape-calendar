@@ -19,8 +19,8 @@ Name of Event
 3. main.js is the most important file and contains all of the code
 
 ## Complile
-1. Download all files and run npm or yarn
+Download all files and run npm or yarn
 
 ## Dependencies 
-1. Found in package.json
+Found in package.json
 

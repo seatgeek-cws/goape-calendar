@@ -7,10 +7,6 @@ const url_obj = new URL(url_string);
 const showId = url_obj.searchParams.get('showid');
 const show = url_obj.searchParams.get('adv');
 let location = url_obj.searchParams.get('loc');
-// hot fix for bookings bar loading different cases for location
-if (location === null) {
-    location = url_obj.searchParams.get('Loc');
-}
 
 const site = url_obj.pathname.split('/')[1];
 const url = 'https://' + url_obj.host + '/' + site + '/';
@@ -27,6 +23,11 @@ let events;
 let eventDates = [];
 let cache = [];
 let monthsAdded = 0;
+
+// hot fix for bookings bar loading different cases for location
+if (location === null) {
+    location = url_obj.searchParams.get('Loc');
+}
 
 // Initial call of Feeds
 getJsonFeed(startDate, endDate);
@@ -47,7 +48,7 @@ function getJsonFeed(fromDate, toDate) {
                 url: url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
                 dataType: "json",
                 jsonp: false,
-                timeout: 10000,
+                timeout: 30000,
                 pleaseWaitDelay: false
             })
         ).then(function (response) {
@@ -70,6 +71,55 @@ function getJsonFeed(fromDate, toDate) {
             }
         }).catch(function (e) {
             console.log("error geting feed: " + e.statusText, "Error message: ", e.message, e);
+            if (e.statusText === 'timeout') {
+                // if timeout load results from API and sort into eventDates
+                console.log("trying API");
+                let toD = new Date(year, month, lastDayOfMonth(year, month));
+                let fromD = new Date(year, month);
+                console.log(toD, fromD);
+
+                $eSRO.api.call("TicketingController.GetAvailableEventsSchedule",
+                { fromDate: fromD, toDate: toD, showId: showId },
+                function(callback) {
+                    cache.push(month);
+                    
+                    monthsAdded++;
+                    waitEnd();
+                    console.log(callback());
+                    var result = callback();
+                    let apiYear = Object.keys(result)[0];
+                    let apiMonth = Object.keys(result[apiYear])[0];
+                    let apiDays = Object.keys(Object.values(result[apiYear])[0]);
+
+                    console.log(apiYear, apiMonth, apiDays);
+                    let tempEventDates = [];
+                    for (let i = 0; i < apiDays.length; i++) {
+                        tempEventDates.push((new Date(apiYear, apiMonth - 1, apiDays[i])).setHours(0, 0, 0, 0).valueOf());
+                    }
+
+                    if (eventDates.length > 0) {
+                        let mergedSet = [...new Set([...eventDates, ...tempEventDates])];
+                        eventDates = mergedSet;
+                        waitEnd();
+                    } else {
+                        eventDates = [...new Set(tempEventDates)];
+                        setupDatePicker();
+                        waitEnd();
+                    }
+
+                    waitEnd();
+            
+                    let newMonth = (month === 11) ? 0 : month + 1;
+                    let newYear = (month === 11) ? year + 1 : year;
+                    
+                    if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
+                        let lastDay = lastDayOfMonth(newYear, newMonth + 1);
+                        let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
+                        let newTo = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + lastDay;  
+                        getJsonFeed(newFrom, newTo);
+                    }
+                });
+            }
         });
     } else {
         waitEnd();
@@ -116,6 +166,7 @@ function onSelect(date) {
 
 function getEventsAvailability(fromDate, toDate) {
     let eventsURL = url + "feed/eventsavailability?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate;
+
     fetch(eventsURL)
         .then((response) => response.json())
         .then((responseJson) => {
@@ -140,6 +191,12 @@ function buildTimeSlotsUI(eventFeed) {
     }
 
     let eventsAvailablity = eventFeed.feed.data.Events.Event;
+    if (eventsAvailablity.length === undefined) {
+        let newArray = [];
+        newArray.push(eventsAvailablity);
+        eventsAvailablity = newArray;
+    } 
+
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
         const availableCapacity = parseInt(eventsAvailablity[i].AvailableCapacity, 10);
@@ -185,15 +242,19 @@ function clearTimes() {
 }
 
 function onChangeMonthYear(year, month, inst) {
+    console.log(year, month, cache);
     clearTimes();
     if ($.inArray(month - 1, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
+        console.log("true");
     } else if (month -1 > cache[0]) {
         pleaseWait();
+        console.log("failed", monthsAdded, preloadMonths);
         if (monthsAdded === preloadMonths) {
             monthsAdded = 0;
             const nextMonth = year + '-' + (("0" + (month)).slice(-2)) + '-' + '01';
             const endOfMonth = year + '-' + (("0" + (month)).slice(-2)) + '-' + lastDayOfMonth(year, month);
+            console.log("calling jSon feed: ", nextMonth, endOfMonth);
             getJsonFeed(nextMonth, endOfMonth);
         }
     }
