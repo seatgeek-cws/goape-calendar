@@ -140,6 +140,13 @@ function buildTimeSlotsUI(eventFeed) {
     }
 
     let eventsAvailablity = eventFeed.feed.data.Events.Event;
+
+    if (eventsAvailablity.length === undefined) {
+        let newArray = [];
+        newArray.push(eventsAvailablity);
+        eventsAvailablity = newArray;
+    } 
+    
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
         const availableCapacity = parseInt(eventsAvailablity[i].AvailableCapacity, 10);
