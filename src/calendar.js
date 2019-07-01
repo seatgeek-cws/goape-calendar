@@ -34,45 +34,78 @@ getJsonFeed(startDate, endDate);
 const title = document.getElementsByClassName('event-title')[0];
 title.innerHTML = '<h2>' + show + ' - ' + location + '</h2>';
 
+function fetchTimeout(url, options, timeout = 7000) {
+    return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), timeout)
+        )
+    ]);
+}
+
 function getJsonFeed(fromDate, toDate) {
     const month = new Date(fromDate).getMonth();
     const year = new Date(fromDate).getFullYear();
     const checkMonth = $.inArray(month, cache) === -1;
+    const thisUrl = url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true"
 
     if (checkMonth && (month < 12)) {
-        Promise.resolve(
-            jQuery.ajax({
-                type: "GET",
-                cache: true,
-                url: url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true",
-                dataType: "json",
-                jsonp: false,
-                timeout: 10000,
-                pleaseWaitDelay: false
+        fetchTimeout(thisUrl, {
+            timeout: 1
+        }, 1)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                processFeedResults(responseJson, month, year);
             })
-        ).then(function (response) {
-            cache.push(month);
-            monthsAdded++;
+            .catch((e) => {
+                console.log("error geting feed: " + e.statusText, "Error message: ", e.message, "error", e);
+                if (e.message.includes('timeout')) {
+                    console.log("timeout true");
+                    console.log(getApi(month, year, 1));
+                }
+            })
+    }
+}
 
-            if (response.feed.EventsCount > 0)
-                mapEventDates(response);
+function getApi(month, year, timeout) {
+    let toD = new Date(year, month, lastDayOfMonth(year, month));
+    let fromD = new Date(year, month);
 
-            waitEnd();
-            
-            let newMonth = (month === 11) ? 0 : month + 1;
-            let newYear = (month === 11) ? year + 1 : year;
-            
-            if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
-                let lastDay = lastDayOfMonth(newYear, newMonth + 1);
-                let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
-                let newTo = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + lastDay;  
-                getJsonFeed(newFrom, newTo);
-            }
-        }).catch(function (e) {
-            console.log("error geting feed: " + e.statusText, "Error message: ", e.message, e);
-        });
-    } else {
-        waitEnd();
+    return Promise.race([
+        $eSRO.api.call("TicketingController.GetAvailableEventsSchedule",
+        { fromDate: fromD, toDate: toD, showId: showId },
+        function(callback) {
+            console.log('Api result', callback());
+        }),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('api timeout')), timeout)
+        )
+    ]);
+}
+
+
+function handleErrors(error) {
+
+}
+
+function processFeedResults(response, month, year) {
+    cache.push(month);
+    monthsAdded++;
+
+    if (response.feed.EventsCount > 0)
+        mapEventDates(response);
+
+    waitEnd();
+
+    let newMonth = (month === 11) ? 0 : month + 1;
+    let newYear = (month === 11) ? year + 1 : year;
+
+    if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
+        let lastDay = lastDayOfMonth(newYear, newMonth + 1);
+        let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
+        let newTo = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + lastDay;
+        getJsonFeed(newFrom, newTo);
     }
 }
 
@@ -129,7 +162,7 @@ function getEventsAvailability(fromDate, toDate) {
 function buildTimeSlotsUI(eventFeed) {
     let legend = false;
     let fragment = document.createDocumentFragment();
-    
+
     if (!legend) {
         $('.time-legend').show();
         legend = true;
@@ -145,8 +178,8 @@ function buildTimeSlotsUI(eventFeed) {
         let newArray = [];
         newArray.push(eventsAvailablity);
         eventsAvailablity = newArray;
-    } 
-    
+    }
+
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
         const availableCapacity = parseInt(eventsAvailablity[i].AvailableCapacity, 10);
@@ -154,20 +187,20 @@ function buildTimeSlotsUI(eventFeed) {
         const time = timeWithSeconds.split(':', 2).join(':');
 
         if (availableCapacity === 0) {
-            eventLink.innerHTML = '<div class="slot"><div class="time">' + 
-                time + '</div><div class="capacity">' + 
+            eventLink.innerHTML = '<div class="slot"><div class="time">' +
+                time + '</div><div class="capacity">' +
                 eventsAvailablity[i].AvailableCapacity + ' spaces' +
                 '</div></div>';
             eventLink.classList.add('timeslot');
             eventLink.classList.add('SoldOut');
         } else {
-            eventLink.innerHTML = '<a href=' + url + 'loader.aspx/?target=hall.aspx%3Fevent%3D' + 
-                eventsAvailablity[i].EventLocalId + '>' + 
-                '<div class="slot"><div class="time">' + 
-                time + 
-                '</div><div class="capacity">' + 
+            eventLink.innerHTML = '<a href=' + url + 'loader.aspx/?target=hall.aspx%3Fevent%3D' +
+                eventsAvailablity[i].EventLocalId + '>' +
+                '<div class="slot"><div class="time">' +
+                time +
+                '</div><div class="capacity">' +
                 eventsAvailablity[i].AvailableCapacity + ' spaces'
-                '</div></div></a>';
+            '</div></div></a>';
 
             let eventClass;
             if (availableCapacity <= 4)
@@ -177,12 +210,12 @@ function buildTimeSlotsUI(eventFeed) {
             eventLink.classList.add('timeslot');
             eventLink.classList.add(eventClass);
         }
-    
+
         fragment.appendChild(eventLink);
     }
 
     eventTimesContainer.appendChild(fragment);
-    times.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+    times.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
 }
 
 function clearTimes() {
@@ -195,7 +228,7 @@ function onChangeMonthYear(year, month, inst) {
     clearTimes();
     if ($.inArray(month - 1, cache) !== -1) {
         $('.date_picker').datepicker("refresh");
-    } else if (month -1 > cache[0]) {
+    } else if (month - 1 > cache[0]) {
         pleaseWait();
         if (monthsAdded === preloadMonths) {
             monthsAdded = 0;
@@ -222,13 +255,13 @@ function waitEnd() {
     if (typeof window.hidePleaseWait === 'function') {
         window.hidePleaseWait();
     } else {
-        let checkFunction = setInterval(function() {
+        let checkFunction = setInterval(function () {
             if (typeof window.hidePleaseWait === 'function') {
                 window.hidePleaseWait();
                 clearInterval(checkFunction);
             }
         }, 100);
     }
-  
+
     $('.date_picker').datepicker("refresh");
 }
