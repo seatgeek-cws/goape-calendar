@@ -15,7 +15,7 @@ Name of Event
 
 ## Installation
 1. Add calendar.aspx to the site directory (/custom/ for example)
-2. In the calendar.aspx page you will find locations to put the Javascript files font in the /dist/ and /util/ folders
+2. In the calendar.aspx page you will find locations to put the Javascript files found in the /dist/ and /util/ folders
 3. main.js is the most important file and contains all of the code
 
 ## Complile
