@@ -5,8 +5,9 @@ import "whatwg-fetch";
 const url_string = window.location.href;
 const url_obj = new URL(url_string);
 const showId = url_obj.searchParams.get('showid');
-const show = url_obj.searchParams.get('adv');
+const show = getUrlParameter('adv');
 let location = url_obj.searchParams.get('loc');
+
 // hot fix for bookings bar loading different cases for location
 if (location === null) {
     location = url_obj.searchParams.get('Loc');
@@ -34,6 +35,21 @@ getJsonFeed(startDate, endDate);
 const title = document.getElementsByClassName('event-title')[0];
 title.innerHTML = '<h2>' + show + ' - ' + location + '</h2>';
 
+function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
+
 function fetchTimeout(url, options, timeout = 7000) {
     return Promise.race([
         fetch(url, options),
@@ -51,18 +67,16 @@ function getJsonFeed(fromDate, toDate) {
 
     if (checkMonth && (month < 12)) {
         fetchTimeout(thisUrl, {
-            timeout: 1
-        }, 1)
+            timeout: 7000
+        }, 10000)
             .then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 processFeedResults(responseJson, month, year);
             })
             .catch((e) => {
                 console.log("error geting feed: " + e.statusText, "Error message: ", e.message, "error", e);
                 if (e.message.includes('timeout')) {
-                    console.log("timeout true");
-                    console.log(getApi(month, year, 1));
+                    let result = getApi(month, year, 45000);
                 }
             })
     }
@@ -73,10 +87,15 @@ function getApi(month, year, timeout) {
     let fromD = new Date(year, month);
 
     return Promise.race([
-        $eSRO.api.call("TicketingController.GetAvailableEventsSchedule",
-        { fromDate: fromD, toDate: toD, showId: showId },
-        function(callback) {
-            console.log('Api result', callback());
+        new Promise((resolve, _) => {
+            $eSRO.api.call("TicketingController.GetAvailableEventsSchedule",
+            { fromDate: fromD, toDate: toD, showId: showId },
+            function (callback) {
+                if (callback() !== undefined) {
+                    processFeedResults(callback, month, year);
+                    resolve();
+                }
+            })
         }),
         new Promise((_, reject) =>
             setTimeout(() => reject(new Error('api timeout')), timeout)
@@ -84,17 +103,32 @@ function getApi(month, year, timeout) {
     ]);
 }
 
-
-function handleErrors(error) {
-
-}
-
 function processFeedResults(response, month, year) {
     cache.push(month);
     monthsAdded++;
 
-    if (response.feed.EventsCount > 0)
-        mapEventDates(response);
+    if (response.feed !== undefined) {
+        if (response.feed.EventsCount > 0)
+            mapEventDates(response);
+    } else {
+        var result = response();
+        let apiYear = Object.keys(result)[0];
+        let apiMonth = Object.keys(result[apiYear])[0];
+        let apiDays = Object.keys(Object.values(result[apiYear])[0]);
+
+        let tempEventDates = [];
+        for (let i = 0; i < apiDays.length; i++) {
+            tempEventDates.push((new Date(apiYear, apiMonth - 1, apiDays[i])).setHours(0, 0, 0, 0).valueOf());
+        }
+
+        if (eventDates.length > 0) {
+            let mergedSet = [...new Set([...eventDates, ...tempEventDates])];
+            eventDates = mergedSet;
+        } else {
+            eventDates = [...new Set(tempEventDates)];
+            setupDatePicker();
+        }
+    }
 
     waitEnd();
 
