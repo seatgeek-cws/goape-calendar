@@ -5,7 +5,7 @@ import "whatwg-fetch";
 const url_string = window.location.href;
 const url_obj = new URL(url_string);
 const showId = url_obj.searchParams.get('showid');
-const show = getUrlParameter('adv');
+const show = url_obj.searchParams.get('adv');
 let location = url_obj.searchParams.get('loc');
 
 // hot fix for bookings bar loading different cases for location
@@ -34,21 +34,6 @@ getJsonFeed(startDate, endDate);
 
 const title = document.getElementsByClassName('event-title')[0];
 title.innerHTML = '<h2>' + show + ' - ' + location + '</h2>';
-
-function getUrlParameter(sParam) {
-    var sPageURL = window.location.search.substring(1),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
-
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-        }
-    }
-};
 
 function fetchTimeout(url, options, timeout = 7000) {
     return Promise.race([
@@ -214,9 +199,13 @@ function buildTimeSlotsUI(eventFeed) {
         eventsAvailablity = newArray;
     }
 
+    if (new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[eventsAvailablity.length -2].ActualEventDate).getTime())
+        eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
+
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
         const availableCapacity = parseInt(eventsAvailablity[i].AvailableCapacity, 10);
+
         const timeWithSeconds = eventsAvailablity[i].ActualEventDate.split('T')[1];
         const time = timeWithSeconds.split(':', 2).join(':');
 
