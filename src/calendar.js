@@ -199,7 +199,7 @@ function buildTimeSlotsUI(eventFeed) {
         eventsAvailablity = newArray;
     }
 
-    if (new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[eventsAvailablity.length -2].ActualEventDate).getTime())
+    if (new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[eventsAvailablity.length -5].ActualEventDate).getTime())
         eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
 
     for (let i = 0; i < eventsAvailablity.length; i++) {
