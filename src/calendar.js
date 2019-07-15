@@ -18,7 +18,6 @@ const url = 'https://' + url_obj.host + '/' + site + '/';
 const preloadMonths = 2;
 const times = document.getElementById('times');
 const eventTimesContainer = document.getElementsByClassName('event-times')[0];
-
 const today = new Date();
 const startDate = today.getFullYear() + "-" + (("0" + (today.getMonth() + 1)).slice(-2)) + "-" + "01";
 const endDate = today.getFullYear() + "-" + (("0" + (today.getMonth() + 1)).slice(-2)) + "-" + lastDayOfMonth(today.getFullYear(), today.getMonth() + 1);
@@ -74,13 +73,13 @@ function getApi(month, year, timeout) {
     return Promise.race([
         new Promise((resolve, _) => {
             $eSRO.api.call("TicketingController.GetAvailableEventsSchedule",
-            { fromDate: fromD, toDate: toD, showId: showId },
-            function (callback) {
-                if (callback() !== undefined) {
-                    processFeedResults(callback, month, year);
-                    resolve();
-                }
-            })
+                { fromDate: fromD, toDate: toD, showId: showId },
+                function (callback) {
+                    if (callback() !== undefined) {
+                        processFeedResults(callback, month, year);
+                        resolve();
+                    }
+                })
         }),
         new Promise((_, reject) =>
             setTimeout(() => reject(new Error('api timeout')), timeout)
@@ -199,8 +198,8 @@ function buildTimeSlotsUI(eventFeed) {
         eventsAvailablity = newArray;
     }
 
-    if (new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[eventsAvailablity.length -2].ActualEventDate).getTime())
-        eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
+    if (new Date(eventsAvailablity[eventsAvailablity.length - 1].ActualEventDate).getTime() < new Date(eventsAvailablity[eventsAvailablity.length - 5].ActualEventDate).getTime())
+        eventsAvailablity.sort(function (a, b) { return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime() });
 
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
