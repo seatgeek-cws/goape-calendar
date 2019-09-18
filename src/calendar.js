@@ -15,7 +15,7 @@ if (location === null) {
 
 const site = url_obj.pathname.split('/')[1];
 const url = 'https://' + url_obj.host + '/' + site + '/';
-const preloadMonths = 3;
+const preloadMonths = 2;
 const times = document.getElementById('times');
 const eventTimesContainer = document.getElementsByClassName('event-times')[0];
 
@@ -28,6 +28,7 @@ let events;
 let eventDates = [];
 let cache = [];
 let monthsAdded = 0;
+let checkMonth = 0;
 
 // Initial call of Feeds
 getJsonFeed(startDate, endDate);
@@ -91,7 +92,12 @@ function getApi(month, year, timeout) {
 function processFeedResults(response, month, year) {
     console.log("feed response", response);
     cache.push(month);
-    monthsAdded++;
+
+    if (response.feed.ShowsCount !== "0") {
+        monthsAdded++;
+    } else {
+        checkMonth++;
+    }
 
     if (response.feed !== undefined) {
         if (response.feed.EventsCount > 0)
@@ -122,7 +128,7 @@ function processFeedResults(response, month, year) {
     let newYear = (month === 11) ? year + 1 : year;
 
     console.log (monthsAdded, preloadMonths);
-    if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
+    if ((monthsAdded < preloadMonths || checkMonth < 12) && $.inArray(newMonth, cache) === -1) {
 
         let lastDay = lastDayOfMonth(newYear, newMonth + 1);
         let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
