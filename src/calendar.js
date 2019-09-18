@@ -118,7 +118,7 @@ function processFeedResults(response, month, year) {
             eventDates = mergedSet;
         } else {
             eventDates = [...new Set(tempEventDates)];
-            setupDatePicker();
+            setupDatePicker(eventDates[0]);
         }
     }
 
@@ -155,10 +155,12 @@ function mapEventDates(callback) {
     }
 }
 
-function setupDatePicker() {
+function setupDatePicker(firstDate) {
+    console.log("firstDate: ", firstDate);
     $.datepicker.setDefaults($.datepicker.regional['']);
     $('.date_picker').datepicker({
         "beforeShowDay": beforeShowDay,
+        //"setDate": firstDate,
         "onSelect": onSelect,
         "onChangeMonthYear": onChangeMonthYear,
         "dateFormat": "yy-mm-dd",
@@ -210,7 +212,7 @@ function buildTimeSlotsUI(eventFeed) {
 
 
     //if (eventsAvailablity.length > 1 && new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[0].ActualEventDate).getTime())
-        eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
+    eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
 
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
