@@ -90,10 +90,10 @@ function getApi(month, year, timeout) {
 }
 
 function processFeedResults(response, month, year) {
-    console.log("feed response", response);
+    //console.log("feed response", response);
     cache.push(month);
 
-    console.log(response.feed.ShowsCount, response.feed.ShowsCount !== "0")
+    //console.log(response.feed.ShowsCount, response.feed.ShowsCount !== "0")
     if (response.feed.ShowsCount !== "0") {
         monthsAdded++;
     } else {
@@ -128,7 +128,7 @@ function processFeedResults(response, month, year) {
     let newMonth = (month === 11) ? 0 : month + 1;
     let newYear = (month === 11) ? year + 1 : year;
 
-    console.log (monthsAdded, preloadMonths);
+    //console.log (monthsAdded, preloadMonths);
     if ((monthsAdded < preloadMonths && checkMonth < 12) && $.inArray(newMonth, cache) === -1) {
 
         let lastDay = lastDayOfMonth(newYear, newMonth + 1);
@@ -157,9 +157,9 @@ function mapEventDates(callback) {
 }
 
 function setupDatePicker(firstDate) {
-    console.log("firstDate: ", firstDate);
+    //console.log("firstDate: ", firstDate);
     var displayDate = new Date(firstDate);
-    console.log(displayDate);
+    //console.log(displayDate);
     $.datepicker.setDefaults($.datepicker.regional['']);
     $('.date_picker').datepicker({
         "beforeShowDay": beforeShowDay,
