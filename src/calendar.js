@@ -15,7 +15,7 @@ if (location === null) {
 
 const site = url_obj.pathname.split('/')[1];
 const url = 'https://' + url_obj.host + '/' + site + '/';
-const preloadMonths = 2;
+const preloadMonths = 3;
 const times = document.getElementById('times');
 const eventTimesContainer = document.getElementsByClassName('event-times')[0];
 
@@ -89,6 +89,7 @@ function getApi(month, year, timeout) {
 }
 
 function processFeedResults(response, month, year) {
+    console.log("feed response", response);
     cache.push(month);
     monthsAdded++;
 
@@ -120,7 +121,9 @@ function processFeedResults(response, month, year) {
     let newMonth = (month === 11) ? 0 : month + 1;
     let newYear = (month === 11) ? year + 1 : year;
 
+    console.log (monthsAdded, preloadMonths);
     if (monthsAdded < preloadMonths && $.inArray(newMonth, cache) === -1) {
+
         let lastDay = lastDayOfMonth(newYear, newMonth + 1);
         let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
         let newTo = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + lastDay;
@@ -199,7 +202,8 @@ function buildTimeSlotsUI(eventFeed) {
         eventsAvailablity = newArray;
     }
 
-    if (new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[eventsAvailablity.length -5].ActualEventDate).getTime())
+
+    //if (eventsAvailablity.length > 1 && new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[0].ActualEventDate).getTime())
         eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
 
     for (let i = 0; i < eventsAvailablity.length; i++) {
