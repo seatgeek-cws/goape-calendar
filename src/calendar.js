@@ -93,6 +93,7 @@ function processFeedResults(response, month, year) {
     console.log("feed response", response);
     cache.push(month);
 
+    console.log(response.feed.ShowsCount, response.feed.ShowsCount !== "0")
     if (response.feed.ShowsCount !== "0") {
         monthsAdded++;
     } else {
@@ -128,7 +129,7 @@ function processFeedResults(response, month, year) {
     let newYear = (month === 11) ? year + 1 : year;
 
     console.log (monthsAdded, preloadMonths);
-    if ((monthsAdded < preloadMonths || checkMonth < 12) && $.inArray(newMonth, cache) === -1) {
+    if ((monthsAdded < preloadMonths && checkMonth < 12) && $.inArray(newMonth, cache) === -1) {
 
         let lastDay = lastDayOfMonth(newYear, newMonth + 1);
         let newFrom = newYear + '-' + (("0" + (newMonth + 1)).slice(-2)) + '-' + '01';
@@ -151,16 +152,18 @@ function mapEventDates(callback) {
         waitEnd();
     } else {
         eventDates = [...new Set(tempEventDates)];
-        setupDatePicker();
+        setupDatePicker(eventDates[0]);
     }
 }
 
 function setupDatePicker(firstDate) {
     console.log("firstDate: ", firstDate);
+    var displayDate = new Date(firstDate);
+    console.log(displayDate);
     $.datepicker.setDefaults($.datepicker.regional['']);
     $('.date_picker').datepicker({
         "beforeShowDay": beforeShowDay,
-        //"setDate": firstDate,
+        "defaultDate": displayDate,
         "onSelect": onSelect,
         "onChangeMonthYear": onChangeMonthYear,
         "dateFormat": "yy-mm-dd",
