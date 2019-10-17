@@ -30,7 +30,6 @@ let cache = [];
 let monthsAdded = 0;
 let checkMonth = 0;
 
-// Initial call of Feeds
 getJsonFeed(startDate, endDate);
 
 const title = document.getElementsByClassName('event-title')[0];
@@ -93,7 +92,6 @@ function processFeedResults(response, month, year) {
     //console.log("feed response", response);
     cache.push(month);
 
-    //console.log(response.feed.ShowsCount, response.feed.ShowsCount !== "0")
     if (response.feed.ShowsCount !== "0") {
         monthsAdded++;
     } else {
@@ -213,8 +211,6 @@ function buildTimeSlotsUI(eventFeed) {
         eventsAvailablity = newArray;
     }
 
-
-    //if (eventsAvailablity.length > 1 && new Date(eventsAvailablity[eventsAvailablity.length -1].ActualEventDate).getTime() < new Date(eventsAvailablity[0].ActualEventDate).getTime())
     eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
 
     for (let i = 0; i < eventsAvailablity.length; i++) {
