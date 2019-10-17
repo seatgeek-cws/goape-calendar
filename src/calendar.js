@@ -74,13 +74,13 @@ function getApi(month, year, timeout) {
     return Promise.race([
         new Promise((resolve, _) => {
             $eSRO.api.call("TicketingController.GetAvailableEventsSchedule",
-            { fromDate: fromD, toDate: toD, showId: showId },
-            function (callback) {
-                if (callback() !== undefined) {
-                    processFeedResults(callback, month, year);
-                    resolve();
-                }
-            })
+                { fromDate: fromD, toDate: toD, showId: showId },
+                function (callback) {
+                    if (callback() !== undefined) {
+                        processFeedResults(callback, month, year);
+                        resolve();
+                    }
+                })
         }),
         new Promise((_, reject) =>
             setTimeout(() => reject(new Error('api timeout')), timeout)
@@ -211,7 +211,7 @@ function buildTimeSlotsUI(eventFeed) {
         eventsAvailablity = newArray;
     }
 
-    eventsAvailablity.sort(function(a,b){return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime()});
+    eventsAvailablity.sort(function (a, b) { return new Date(a.ActualEventDate).getTime() - new Date(b.ActualEventDate).getTime() });
 
     for (let i = 0; i < eventsAvailablity.length; i++) {
         const eventLink = document.createElement('div');
