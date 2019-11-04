@@ -260,9 +260,15 @@ function clearTimes() {
 
 function onChangeMonthYear(year, month, inst) {
     clearTimes();
+    //console.log(cache);
+    cache.sort();
+    //console.log(cache);
+    //console.log("onchangemonth", year, month);
     if ($.inArray(month - 1, cache) !== -1) {
+        //console.log("month in array");
         $('.date_picker').datepicker("refresh");
-    } else if (month - 1 > cache[0]) {
+    } else if (month - 1 > cache[0] || month === 1) {
+        //console.log("loading new month", month);
         pleaseWait();
         if (monthsAdded === preloadMonths) {
             monthsAdded = 0;
