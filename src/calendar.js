@@ -48,7 +48,7 @@ function getJsonFeed(fromDate, toDate) {
     const month = new Date(fromDate).getMonth();
     const year = new Date(fromDate).getFullYear();
     const checkMonth = $.inArray(month, cache) === -1;
-    const thisUrl = url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact&disconnect=true"
+    const thisUrl = url + "feed/events?json&showid=" + showId + "&fromdate=" + fromDate + "&todate=" + toDate + "&compact"
 
     if (checkMonth && (month < 12)) {
         fetchTimeout(thisUrl, {
